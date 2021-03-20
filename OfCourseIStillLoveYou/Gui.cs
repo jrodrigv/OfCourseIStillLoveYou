@@ -90,7 +90,7 @@ namespace OfCourseIStillLoveYou
                 {
 
                     trackingCamera.Value.CheckIfResizing();
-                    trackingCamera.Value.CreateGUI();
+                    trackingCamera.Value.CreateGui();
                 }
             }
         }

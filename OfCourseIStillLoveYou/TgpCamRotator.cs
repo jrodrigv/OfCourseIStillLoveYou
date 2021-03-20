@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace OfCourseIStillLoveYou
 {
@@ -18,7 +13,7 @@ namespace OfCourseIStillLoveYou
             if (NearCamera.transform == null) return;
             if (transform == null) return;
 
-            transform.position = (Vector3)ScaledSpace.LocalToScaledSpace((Vector3d)NearCamera.transform.localPosition);
+            transform.position = ScaledSpace.LocalToScaledSpace((Vector3d)NearCamera.transform.localPosition);
             transform.rotation = NearCamera.transform.rotation;
         }
     }

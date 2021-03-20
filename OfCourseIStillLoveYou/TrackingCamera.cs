@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HullcamVDS;
 using UnityEngine;
 
@@ -10,38 +7,26 @@ namespace OfCourseIStillLoveYou
 {
     public class TrackingCamera
     {
-        private readonly int _id;
-        private readonly MuMechModuleHullCamera _hullcamera;
-        private float _windowWidth;
-        private float _windowHeight;
-        private Rect _windowRect;
-        private float camImageSize = 360;
-        private float adjCamImageSize = 360;
-        public RenderTexture targetCamRenderTexture;
-        private static float buttonHeight = 18;
-        private static float gap = 2;
-
-
-        private Camera[] cameras = new Camera[3];
-
-        public bool Enabled { get; set; }
+        private static readonly float buttonHeight = 18;
+        private static readonly float gap = 2;
 
         //private Camera partRealCamera;
 
 
-        public static Texture2D resizeTexture =
+        public static Texture2D ResizeTexture =
             GameDatabase.Instance.GetTexture("OfCourseIStillLoveYou/Textures/" + "resizeSquare", false);
 
-        public float TARGET_WINDOW_SCALE_MAX { get; set; } = 2f;
+        private readonly MuMechModuleHullCamera _hullcamera;
+        private readonly int _id;
+        private readonly float camImageSize = 360;
+        private float _adjCamImageSize = 360;
 
-        public float TARGET_WINDOW_SCALE_MIN { get; set; } = 0.5f;
 
-
-        public bool ResizingWindow { get; set; }
-
-        public bool windowIsOpen { get; set; }
-
-        public float TARGET_WINDOW_SCALE { get; set; } = 1;
+        private Camera[] _cameras = new Camera[3];
+        private float _windowHeight;
+        private Rect _windowRect;
+        private float _windowWidth;
+        public RenderTexture TargetCamRenderTexture;
 
 
         public TrackingCamera(int id, MuMechModuleHullCamera hullcamera)
@@ -49,52 +34,62 @@ namespace OfCourseIStillLoveYou
             _id = id;
             _hullcamera = hullcamera;
 
-            targetCamRenderTexture = new RenderTexture(768, 768, 24);
-            targetCamRenderTexture.antiAliasing = 1;
-            targetCamRenderTexture.Create();
-            _windowWidth = adjCamImageSize + (3 * buttonHeight) + 16 + 2 * gap;
-            _windowHeight = adjCamImageSize + 23;
-            this._windowRect = new Rect(Screen.width - _windowWidth, Screen.height - _windowHeight, _windowWidth, _windowHeight);
+            TargetCamRenderTexture = new RenderTexture(768, 768, 24);
+            TargetCamRenderTexture.antiAliasing = 1;
+            TargetCamRenderTexture.Create();
+            _windowWidth = _adjCamImageSize + 3 * buttonHeight + 16 + 2 * gap;
+            _windowHeight = _adjCamImageSize + 23;
+            _windowRect = new Rect(Screen.width - _windowWidth, Screen.height - _windowHeight, _windowWidth,
+                _windowHeight);
             SetCameras();
-            
-            Enabled = true;
 
+            Enabled = true;
         }
+
+        public bool Enabled { get; set; }
+
+        public float TargetWindowScaleMax { get; set; } = 2f;
+
+        public float TargetWindowScaleMin { get; set; } = 0.5f;
+
+
+        public bool ResizingWindow { get; set; }
+
+        public bool WindowIsOpen { get; set; }
+
+        public float TargetWindowScale { get; set; } = 1;
 
         private Camera FindCamera(string cameraName)
         {
-            foreach (Camera cam in Camera.allCameras)
-            {
+            foreach (var cam in Camera.allCameras)
                 if (cam.name == cameraName)
-                {
                     return cam;
-                }
 
-            }
             Debug.Log("Couldn't find " + cameraName);
             return null;
         }
 
         private void SetCameras()
         {
+            var cam1Obj = new GameObject();
+            var partNearCamera = cam1Obj.AddComponent<Camera>();
 
-
-            GameObject cam1Obj = new GameObject();
-            Camera partNearCamera = cam1Obj.AddComponent<Camera>();
-   
             partNearCamera.CopyFrom(Camera.allCameras.FirstOrDefault(cam => cam.name == "Camera 00"));
             partNearCamera.name = "jrNear";
-            partNearCamera.transform.parent = _hullcamera.cameraTransformName.Length <= 0 ? _hullcamera.part.transform : _hullcamera.part.FindModelTransform(_hullcamera.cameraTransformName);
-            partNearCamera.transform.localRotation = Quaternion.LookRotation(_hullcamera.cameraForward, _hullcamera.cameraUp);
+            partNearCamera.transform.parent = _hullcamera.cameraTransformName.Length <= 0
+                ? _hullcamera.part.transform
+                : _hullcamera.part.FindModelTransform(_hullcamera.cameraTransformName);
+            partNearCamera.transform.localRotation =
+                Quaternion.LookRotation(_hullcamera.cameraForward, _hullcamera.cameraUp);
             partNearCamera.transform.localPosition = _hullcamera.cameraPosition;
-            partNearCamera.fieldOfView = this._hullcamera.cameraFoV;
-            partNearCamera.targetTexture = targetCamRenderTexture;
-            cameras[0] = partNearCamera;
+            partNearCamera.fieldOfView = _hullcamera.cameraFoV;
+            partNearCamera.targetTexture = TargetCamRenderTexture;
+            _cameras[0] = partNearCamera;
 
 
-            GameObject cam2Obj = new GameObject();
-            Camera partScaledCamera = cam2Obj.AddComponent<Camera>();
-            Camera mainSkyCam = FindCamera("Camera ScaledSpace");
+            var cam2Obj = new GameObject();
+            var partScaledCamera = cam2Obj.AddComponent<Camera>();
+            var mainSkyCam = FindCamera("Camera ScaledSpace");
 
             partScaledCamera.CopyFrom(mainSkyCam);
             partScaledCamera.name = "jrScaled";
@@ -104,18 +99,18 @@ namespace OfCourseIStillLoveYou
             partScaledCamera.transform.localRotation = Quaternion.identity;
             partScaledCamera.transform.localPosition = Vector3.zero;
             partScaledCamera.fieldOfView = 60;
-            partScaledCamera.targetTexture = targetCamRenderTexture;
+            partScaledCamera.targetTexture = TargetCamRenderTexture;
             partScaledCamera.transform.localScale = Vector3.one;
 
-            cameras[1] = partScaledCamera;
+            _cameras[1] = partScaledCamera;
             var camRotator = cam2Obj.AddComponent<TgpCamRotator>();
             camRotator.NearCamera = partNearCamera;
 
 
             //galaxy camera
-            GameObject galaxyCamObj = new GameObject();
-            Camera galaxyCam = galaxyCamObj.AddComponent<Camera>();
-            Camera mainGalaxyCam = FindCamera("GalaxyCamera");
+            var galaxyCamObj = new GameObject();
+            var galaxyCam = galaxyCamObj.AddComponent<Camera>();
+            var mainGalaxyCam = FindCamera("GalaxyCamera");
 
             galaxyCam.CopyFrom(mainGalaxyCam);
             galaxyCam.name = "jrGalaxy";
@@ -124,19 +119,16 @@ namespace OfCourseIStillLoveYou
             galaxyCam.transform.localRotation = Quaternion.identity;
             galaxyCam.transform.localScale = Vector3.one;
             galaxyCam.fieldOfView = 60;
-            galaxyCam.targetTexture = targetCamRenderTexture;
-            cameras[2] = galaxyCam;
+            galaxyCam.targetTexture = TargetCamRenderTexture;
+            _cameras[2] = galaxyCam;
             var camRotatorgalaxy = galaxyCamObj.AddComponent<TgpCamRotator>();
             camRotatorgalaxy.NearCamera = partNearCamera;
 
-            for (int i = 0; i < cameras.Length; i++)
-            {
-                cameras[i].enabled = false;
-            }
+            for (var i = 0; i < _cameras.Length; i++) _cameras[i].enabled = false;
         }
 
 
-        public void CreateGUI()
+        public void CreateGui()
         {
             if (_hullcamera == null || _hullcamera.vessel == null)
             {
@@ -146,7 +138,8 @@ namespace OfCourseIStillLoveYou
 
             if (!Enabled) return;
 
-            _windowRect = GUI.Window(_id, _windowRect, WindowTargetCam, _hullcamera.vessel.GetDisplayName() + "." + _hullcamera.cameraName);
+            _windowRect = GUI.Window(_id, _windowRect, WindowTargetCam,
+                _hullcamera.vessel.GetDisplayName() + "." + _hullcamera.cameraName);
         }
 
         public void CheckIfResizing()
@@ -154,76 +147,72 @@ namespace OfCourseIStillLoveYou
             if (!Enabled) return;
 
             if (Event.current.type == EventType.MouseUp)
-            {
-                if (ResizingWindow) ResizingWindow = false;
-            }
+                if (ResizingWindow)
+                    ResizingWindow = false;
         }
 
-        void WindowTargetCam(int windowID)
+        private void WindowTargetCam(int windowId)
         {
             if (!Enabled) return;
 
-            float windowScale = TARGET_WINDOW_SCALE;
-            adjCamImageSize = camImageSize * windowScale;
-   
+            var windowScale = TargetWindowScale;
+            _adjCamImageSize = camImageSize * windowScale;
 
-            windowIsOpen = true;
 
-            GUI.DragWindow(new Rect(0, 0, this._windowHeight - 18, 30));
+            WindowIsOpen = true;
+
+            GUI.DragWindow(new Rect(0, 0, _windowHeight - 18, 30));
             if (GUI.Button(new Rect(_windowWidth - 18, 2, 16, 16), "X", GUI.skin.button))
             {
                 Disable();
-                
 
-                
+
                 return;
             }
 
-            Rect imageRect = new Rect(2, 20, adjCamImageSize, adjCamImageSize);
+            var imageRect = new Rect(2, 20, _adjCamImageSize, _adjCamImageSize);
 
 
-            GUI.DrawTexture(imageRect, targetCamRenderTexture, ScaleMode.StretchToFill, false);
-            
+            GUI.DrawTexture(imageRect, TargetCamRenderTexture, ScaleMode.StretchToFill, false);
+
             //resizing
-            Rect resizeRect =
+            var resizeRect =
                 new Rect(_windowWidth - 18, _windowHeight - 18, 16, 16);
-           
-            
-            GUI.DrawTexture(resizeRect, resizeTexture, ScaleMode.StretchToFill, true);
-            
+
+
+            GUI.DrawTexture(resizeRect, ResizeTexture, ScaleMode.StretchToFill, true);
+
             if (Event.current.type == EventType.MouseDown && resizeRect.Contains(Event.current.mousePosition))
-            {
                 ResizingWindow = true;
-            }
 
             if (Event.current.type == EventType.Repaint && ResizingWindow)
-            {
                 if (Math.Abs(Mouse.delta.x) > 1 || Math.Abs(Mouse.delta.y) > 0.1f)
                 {
                     var diff = Mouse.delta.x + Mouse.delta.y;
                     UpdateTargetScale(diff);
                     ResizeTargetWindow();
                 }
-            }
+
             //ResetZoomKeys();
             RepositionWindow(ref _windowRect);
         }
-        void UpdateTargetScale(float diff)
-        {
-            float scaleDiff = ((diff / (_windowRect.width + _windowRect.height)) * 100 * .01f);
-            TARGET_WINDOW_SCALE += Mathf.Abs(scaleDiff) > .01f ? scaleDiff : scaleDiff > 0 ? .01f : -.01f;
 
-            TARGET_WINDOW_SCALE += Mathf.Abs(scaleDiff) > .01f ? scaleDiff : scaleDiff > 0 ? .01f : -.01f;
-            TARGET_WINDOW_SCALE = Mathf.Clamp(TARGET_WINDOW_SCALE,
-              TARGET_WINDOW_SCALE_MIN,
-                TARGET_WINDOW_SCALE_MAX);
+        private void UpdateTargetScale(float diff)
+        {
+            var scaleDiff = diff / (_windowRect.width + _windowRect.height) * 100 * .01f;
+            TargetWindowScale += Mathf.Abs(scaleDiff) > .01f ? scaleDiff : scaleDiff > 0 ? .01f : -.01f;
+
+            TargetWindowScale += Mathf.Abs(scaleDiff) > .01f ? scaleDiff : scaleDiff > 0 ? .01f : -.01f;
+            TargetWindowScale = Mathf.Clamp(TargetWindowScale,
+                TargetWindowScaleMin,
+                TargetWindowScaleMax);
         }
 
 
-        void ResizeTargetWindow()
+        private void ResizeTargetWindow()
         {
-            _windowWidth = camImageSize * TARGET_WINDOW_SCALE + (3 * buttonHeight) + 16 + 2 * gap;
-            _windowHeight = camImageSize * TARGET_WINDOW_SCALE + 23;
+            _windowWidth = camImageSize * TargetWindowScale + 3 * buttonHeight + 16 + 2 * gap;
+            _windowHeight = camImageSize * TargetWindowScale + 23;
             _windowRect = new Rect(_windowRect.x, _windowRect.y, _windowWidth, _windowHeight);
         }
 
@@ -241,36 +230,29 @@ namespace OfCourseIStillLoveYou
 
         public void RenderCameras()
         {
-            for (int i = cameras.Length-1; i >= 0; i--)
+            for (var i = _cameras.Length - 1; i >= 0; i--)
             {
-                if (cameras[i] == null) return;
+                if (_cameras[i] == null) return;
 
-                if (i > 0)
-                {
-                    cameras[i].fieldOfView = 60;
-                }
-                cameras[i].Render();
+                if (i > 0) _cameras[i].fieldOfView = 60;
+
+                _cameras[i].Render();
             }
         }
 
         public void Disable()
         {
-            Core.TrackedCameras.Remove(this._id);
-            this.Enabled = false;
-           
-            foreach (var camera in cameras)
+            Core.TrackedCameras.Remove(_id);
+            Enabled = false;
+
+            foreach (var camera in _cameras)
             {
                 if (camera == null) continue;
 
                 camera.enabled = false;
             }
 
-            this.cameras = null;
+            _cameras = null;
         }
-
-   
     }
-
-
-   
 }
