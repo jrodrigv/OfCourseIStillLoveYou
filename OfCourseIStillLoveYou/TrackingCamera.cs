@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using HullcamVDS;
+using scatterer;
 using UnityEngine;
 
 namespace OfCourseIStillLoveYou
@@ -85,8 +87,11 @@ namespace OfCourseIStillLoveYou
             partNearCamera.fieldOfView = _hullcamera.cameraFoV;
             partNearCamera.targetTexture = TargetCamRenderTexture;
             _cameras[0] = partNearCamera;
-
-
+            var partialUnifiedCameraDepthBuffer = (PartialDepthBuffer) _cameras[0].gameObject.AddComponent(typeof(PartialDepthBuffer));
+            partialUnifiedCameraDepthBuffer.Init(partNearCamera);
+            
+            
+            
             var cam2Obj = new GameObject();
             var partScaledCamera = cam2Obj.AddComponent<Camera>();
             var mainSkyCam = FindCamera("Camera ScaledSpace");
@@ -98,10 +103,8 @@ namespace OfCourseIStillLoveYou
             partScaledCamera.transform.parent = mainSkyCam.transform;
             partScaledCamera.transform.localRotation = Quaternion.identity;
             partScaledCamera.transform.localPosition = Vector3.zero;
-            partScaledCamera.fieldOfView = 60;
-            partScaledCamera.targetTexture = TargetCamRenderTexture;
             partScaledCamera.transform.localScale = Vector3.one;
-
+            partScaledCamera.targetTexture = TargetCamRenderTexture;
             _cameras[1] = partScaledCamera;
             var camRotator = cam2Obj.AddComponent<TgpCamRotator>();
             camRotator.NearCamera = partNearCamera;
@@ -175,6 +178,25 @@ namespace OfCourseIStillLoveYou
 
             GUI.DrawTexture(imageRect, TargetCamRenderTexture, ScaleMode.StretchToFill, false);
 
+            GUIStyle dataStyle = new GUIStyle();
+            dataStyle.alignment = TextAnchor.MiddleCenter;
+            dataStyle.normal.textColor = Color.white;
+            dataStyle.fontStyle = FontStyle.Bold;
+
+            //target data
+            dataStyle.fontSize = (int)Mathf.Clamp(16 * TargetWindowScale, 9, 16);
+            //float dataStartX = stabilStartX + stabilizeRect.width + 8;
+            Rect targetRangeRect = new Rect(imageRect.x, (_adjCamImageSize * 0.94f) - (int)Mathf.Clamp(18 * TargetWindowScale, 9, 18), _adjCamImageSize, (int)Mathf.Clamp(18 * TargetWindowScale, 10, 18));
+            
+            float  altitudeInKm = (float) Math.Round(this._hullcamera.vessel.altitude / 1000f, 1);
+            int speed = (int) Math.Round(this._hullcamera.vessel.speed * 3.6f,0);
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("ALTITUDE: " + altitudeInKm.ToString("0.0") + " KM");
+            sb.AppendLine("SPEED: " + speed + " KM/H");
+
+            GUI.Label(targetRangeRect, sb.ToString(), dataStyle);
+
             //resizing
             var resizeRect =
                 new Rect(_windowWidth - 18, _windowHeight - 18, 16, 16);
@@ -192,7 +214,7 @@ namespace OfCourseIStillLoveYou
                     UpdateTargetScale(diff);
                     ResizeTargetWindow();
                 }
-
+            
             //ResetZoomKeys();
             RepositionWindow(ref _windowRect);
         }

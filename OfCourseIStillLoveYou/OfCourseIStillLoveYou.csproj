@@ -43,6 +43,10 @@
       <HintPath>..\..\_LocalDev\KSPRefs\KSPAssets.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="scatterer, Version=0.723.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\GAMES\KERBAL\Kerbal Space Program_1111_RO_RP1\GameData\scatterer\scatterer.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.dll</HintPath>
       <Private>False</Private>
@@ -107,6 +111,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PartialDepthBuffer.cs" />
     <Compile Include="TgpCamRotator.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Gui.cs" />
