@@ -47,6 +47,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>D:\GAMES\KERBAL\Kerbal Space Program_1111_RO_RP1\GameData\scatterer\scatterer.dll</HintPath>
     </Reference>
+    <Reference Include="TUFX">
+      <HintPath>D:\GAMES\KERBAL\Kerbal Space Program_1111_RO_JR\GameData\TUFX\Plugins\TUFX.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.dll</HintPath>
       <Private>False</Private>

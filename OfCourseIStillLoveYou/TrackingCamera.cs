@@ -3,7 +3,10 @@ using System.Linq;
 using System.Text;
 using HullcamVDS;
 using scatterer;
+using TUFX;
+using TUFX.PostProcessing;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 
 namespace OfCourseIStillLoveYou
 {
@@ -29,6 +32,7 @@ namespace OfCourseIStillLoveYou
         private Rect _windowRect;
         private float _windowWidth;
         public RenderTexture TargetCamRenderTexture;
+        //private FlightReflectionProbe reflectionProbe;
 
 
         public TrackingCamera(int id, MuMechModuleHullCamera hullcamera)
@@ -50,7 +54,7 @@ namespace OfCourseIStillLoveYou
 
         public bool Enabled { get; set; }
 
-        public float TargetWindowScaleMax { get; set; } = 2f;
+        public float TargetWindowScaleMax { get; set; } = 3f;
 
         public float TargetWindowScaleMin { get; set; } = 0.5f;
 
@@ -87,11 +91,24 @@ namespace OfCourseIStillLoveYou
             partNearCamera.fieldOfView = _hullcamera.cameraFoV;
             partNearCamera.targetTexture = TargetCamRenderTexture;
             _cameras[0] = partNearCamera;
+
+            ////Reflections per vessel
+            //this.reflectionProbe = FlightReflectionProbe.Spawn();
+            //this.reflectionProbe.transform.SetParent(_cameras[0].transform.parent);
+            //this.reflectionProbe.Enable(true);
+
+            //Scatterer shadow fix
             var partialUnifiedCameraDepthBuffer = (PartialDepthBuffer) _cameras[0].gameObject.AddComponent(typeof(PartialDepthBuffer));
             partialUnifiedCameraDepthBuffer.Init(partNearCamera);
-            
-            
-            
+
+            //TUFX
+            PostProcessLayer layer = _cameras[0].gameObject.AddOrGetComponent<PostProcessLayer>();
+            layer.Init(TexturesUnlimitedFXLoader.Resources);
+            layer.volumeLayer = ~0;
+            PostProcessVolume volume = _cameras[0].gameObject.AddOrGetComponent<PostProcessVolume>();
+            volume.isGlobal = true;
+            volume.priority = 100;
+
             var cam2Obj = new GameObject();
             var partScaledCamera = cam2Obj.AddComponent<Camera>();
             var mainSkyCam = FindCamera("Camera ScaledSpace");
@@ -182,6 +199,7 @@ namespace OfCourseIStillLoveYou
             dataStyle.alignment = TextAnchor.MiddleCenter;
             dataStyle.normal.textColor = Color.white;
             dataStyle.fontStyle = FontStyle.Bold;
+            dataStyle.fontSize = 18;
 
             //target data
             dataStyle.fontSize = (int)Mathf.Clamp(16 * TargetWindowScale, 9, 16);
