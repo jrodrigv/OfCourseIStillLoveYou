@@ -38,6 +38,7 @@
     </Reference>
     <Reference Include="HullCamera">
       <HintPath>D:\GAMES\KERBAL\Kerbal Space Program_1111_RO_RP1\GameData\HullCameraVDS\Plugins\HullCamera.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="KSPAssets">
       <HintPath>..\..\_LocalDev\KSPRefs\KSPAssets.dll</HintPath>
@@ -46,9 +47,11 @@
     <Reference Include="scatterer, Version=0.723.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>D:\GAMES\KERBAL\Kerbal Space Program_1111_RO_RP1\GameData\scatterer\scatterer.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="TUFX">
       <HintPath>D:\GAMES\KERBAL\Kerbal Space Program_1111_RO_JR\GameData\TUFX\Plugins\TUFX.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.dll</HintPath>

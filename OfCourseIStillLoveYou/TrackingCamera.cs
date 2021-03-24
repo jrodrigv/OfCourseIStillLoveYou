@@ -32,7 +32,6 @@ namespace OfCourseIStillLoveYou
         private Rect _windowRect;
         private float _windowWidth;
         public RenderTexture TargetCamRenderTexture;
-        //private FlightReflectionProbe reflectionProbe;
 
 
         public TrackingCamera(int id, MuMechModuleHullCamera hullcamera)
@@ -50,6 +49,7 @@ namespace OfCourseIStillLoveYou
             SetCameras();
 
             Enabled = true;
+
         }
 
         public bool Enabled { get; set; }
@@ -92,10 +92,6 @@ namespace OfCourseIStillLoveYou
             partNearCamera.targetTexture = TargetCamRenderTexture;
             _cameras[0] = partNearCamera;
 
-            ////Reflections per vessel
-            //this.reflectionProbe = FlightReflectionProbe.Spawn();
-            //this.reflectionProbe.transform.SetParent(_cameras[0].transform.parent);
-            //this.reflectionProbe.Enable(true);
 
             //Scatterer shadow fix
             var partialUnifiedCameraDepthBuffer = (PartialDepthBuffer) _cameras[0].gameObject.AddComponent(typeof(PartialDepthBuffer));
@@ -182,7 +178,7 @@ namespace OfCourseIStillLoveYou
             WindowIsOpen = true;
 
             GUI.DragWindow(new Rect(0, 0, _windowHeight - 18, 30));
-            if (GUI.Button(new Rect(_windowWidth - 18, 2, 16, 16), "X", GUI.skin.button))
+            if (GUI.Button(new Rect(_windowWidth - 18, 2, 20, 16), "X", GUI.skin.button))
             {
                 Disable();
 
