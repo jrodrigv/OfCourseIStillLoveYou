@@ -135,6 +135,9 @@ namespace OfCourseIStillLoveYou
                 if (!Core.TrackedCameras.ContainsKey(camera.GetInstanceID()))
                 {
                     var newCamera = new TrackingCamera(camera.GetInstanceID(), camera);
+
+                    StartCoroutine(newCamera.SendCameraImage());
+
                     Core.TrackedCameras.Add(camera.GetInstanceID(), newCamera);
                 }
             }

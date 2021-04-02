@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using HullcamVDS;
+using OfCourseIStillLoveYou.Client;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace OfCourseIStillLoveYou
 {
@@ -10,6 +14,12 @@ namespace OfCourseIStillLoveYou
     public class Core : MonoBehaviour
     {
         public static  Dictionary<int, TrackingCamera> TrackedCameras = new Dictionary<int, TrackingCamera>();
+
+        private void Awake()
+        {
+            GrpcClient.ConnectToServer();
+        }
+
 
         public static void Log(string message)
         {
@@ -51,22 +61,12 @@ namespace OfCourseIStillLoveYou
 
         void LateUpdate()
         {
-            //if (cameraEnabled)
-            //{
-            //    if (cameras == null || cameras[0] == null)
-            //    {
-            //        DisableCamera();
-            //        return;
-            //    }
-            //    RenderCameras();
-            //}
-
             RenderCameras();
         }
 
+
         private void RenderCameras()
         {
-
             foreach (var trackedCamerasValue in TrackedCameras.Values)
             {
                 if (trackedCamerasValue.Enabled)
@@ -75,5 +75,6 @@ namespace OfCourseIStillLoveYou
                 }
             }
         }
+
     }
 }

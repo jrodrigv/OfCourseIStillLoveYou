@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+option csharp_namespace = "OfCourseIStillLoveYou.Communication";
+
+package CameraStream;
+
+
+service CameraStream {
+  rpc SendCameraStream (SendCameraStreamRequest) returns (SendCameraStreamResult);
+  rpc GetActiveCameraIds (GetActiveCameraIdsRequest) returns (GetActiveCameraIdsResult);
+  rpc GetCameraTexture (GetCameraTextureRequest) returns (GetCameraTextureResult);
+}
+
+
+
+message SendCameraStreamRequest {
+  string cameraId = 1;
+  string cameraName = 2;
+  string speed = 3;
+  string altitude = 4;
+  bytes texture = 5;
+}
+
+message SendCameraStreamResult {
+
+}
+
+message GetActiveCameraIdsRequest {
+  
+}
+
+message GetActiveCameraIdsResult {
+  repeated string cameras  = 1;
+}
+
+
+message GetCameraTextureRequest {
+   string cameraId = 1;
+}
+
+message GetCameraTextureResult {
+    string cameraId = 1;
+    string cameraName = 2;
+    string speed = 3;
+    string altitude = 4;
+    bytes texture = 5;
+
+}
+
+
+

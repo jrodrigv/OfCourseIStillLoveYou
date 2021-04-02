@@ -1,12 +1,19 @@
 ﻿using System;
+using System.Collections;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using HullcamVDS;
+using OfCourseIStillLoveYou.Client;
 using scatterer;
 using TUFX;
 using TUFX.PostProcessing;
+using Unity.Collections;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Rendering.PostProcessing;
+
 
 namespace OfCourseIStillLoveYou
 {
@@ -29,17 +36,24 @@ namespace OfCourseIStillLoveYou
 
         private Camera[] _cameras = new Camera[3];
         private float _windowHeight;
+
+        public string name { get; private set; }
+
         private Rect _windowRect;
         private float _windowWidth;
         public RenderTexture TargetCamRenderTexture;
-
+        private Texture2D texture2D = new Texture2D(768, 768, TextureFormat.ARGB32, false);
+        private byte[] jpgTexture;
+        private NativeArray<byte> nativeTexture = new NativeArray<byte>();
+        private bool NeedToCaptureCamera = true;
 
         public TrackingCamera(int id, MuMechModuleHullCamera hullcamera)
         {
             _id = id;
             _hullcamera = hullcamera;
 
-            TargetCamRenderTexture = new RenderTexture(768, 768, 24);
+            TargetCamRenderTexture = new RenderTexture(768, 768, 24, RenderTextureFormat.ARGB32);
+
             TargetCamRenderTexture.antiAliasing = 1;
             TargetCamRenderTexture.Create();
             _windowWidth = _adjCamImageSize + 3 * buttonHeight + 16 + 2 * gap;
@@ -64,6 +78,8 @@ namespace OfCourseIStillLoveYou
         public bool WindowIsOpen { get; set; }
 
         public float TargetWindowScale { get; set; } = 1;
+        public string altitudeString { get; private set; }
+        public string speedString { get; private set; }
 
         private Camera FindCamera(string cameraName)
         {
@@ -74,6 +90,39 @@ namespace OfCourseIStillLoveYou
             Debug.Log("Couldn't find " + cameraName);
             return null;
         }
+
+        WaitForEndOfFrame frameEnd = new WaitForEndOfFrame();
+        //WaitForSeconds waitTime = new WaitForSeconds(0.0333F);
+        WaitForFixedUpdate waitFixedUpdate = new WaitForFixedUpdate();
+        public IEnumerator SendCameraImage()
+        {
+            while (this.Enabled)
+            {
+                //yield return waitTime;
+                yield return frameEnd;
+
+                Graphics.CopyTexture(this.TargetCamRenderTexture, this.texture2D);
+
+                AsyncGPUReadbackRequest request = AsyncGPUReadback.Request(this.texture2D);
+
+                while (!request.done)
+                {
+                    yield return frameEnd;
+                }
+               
+                texture2D.LoadRawTextureData(request.GetData<byte>());
+
+                Task.Run(() => jpgTexture = ImageConversion.EncodeToJPG(texture2D)).ContinueWith( (texture) => GrpcClient.SendCameraTextureAsync(new CameraData()
+                {
+                    CameraId = _id.ToString(),
+                    CameraName = name,
+                    Speed = speedString,
+                    Altitude = altitudeString,
+                    Texture = jpgTexture
+                }));
+            }
+        }
+
 
         private void SetCameras()
         {
@@ -92,6 +141,9 @@ namespace OfCourseIStillLoveYou
             partNearCamera.targetTexture = TargetCamRenderTexture;
             _cameras[0] = partNearCamera;
 
+           //var cameraStreaming = cam1Obj.AddComponent<CameraStreaming>();
+           // cameraStreaming.CameraId = this._id;
+           // cameraStreaming.CameraTexture = TargetCamRenderTexture;
 
             //Scatterer shadow fix
             var partialUnifiedCameraDepthBuffer = (PartialDepthBuffer) _cameras[0].gameObject.AddComponent(typeof(PartialDepthBuffer));
@@ -154,8 +206,10 @@ namespace OfCourseIStillLoveYou
 
             if (!Enabled) return;
 
+            name = _hullcamera.vessel.GetDisplayName() + "." + _hullcamera.cameraName;
+
             _windowRect = GUI.Window(_id, _windowRect, WindowTargetCam,
-                _hullcamera.vessel.GetDisplayName() + "." + _hullcamera.cameraName);
+                name);
         }
 
         public void CheckIfResizing()
@@ -188,6 +242,7 @@ namespace OfCourseIStillLoveYou
 
             var imageRect = new Rect(2, 20, _adjCamImageSize, _adjCamImageSize);
 
+         
 
             GUI.DrawTexture(imageRect, TargetCamRenderTexture, ScaleMode.StretchToFill, false);
 
@@ -206,10 +261,20 @@ namespace OfCourseIStillLoveYou
             int speed = (int) Math.Round(this._hullcamera.vessel.speed * 3.6f,0);
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("ALTITUDE: " + altitudeInKm.ToString("0.0") + " KM");
-            sb.AppendLine("SPEED: " + speed + " KM/H");
+
+            this.altitudeString = "ALTITUDE: " + altitudeInKm.ToString("0.0") + " KM";
+            this.speedString = "SPEED: " + speed + " KM/H";
+            sb.AppendLine(this.altitudeString);
+            sb.AppendLine(this.speedString);
 
             GUI.Label(targetRangeRect, sb.ToString(), dataStyle);
+
+            if (NeedToCaptureCamera)
+            {           
+              
+            }
+
+            NeedToCaptureCamera = !NeedToCaptureCamera;
 
             //resizing
             var resizeRect =
