@@ -55,7 +55,6 @@ namespace OfCourseIStillLoveYou.Server
 
                 if (!string.IsNullOrWhiteSpace(keyStroke) && keyStroke != ExitCommand)
                 {
-                   
                   
                 }
                 Task.Delay(100).Wait();
@@ -80,8 +79,8 @@ namespace OfCourseIStillLoveYou.Server
 
             foreach (var cameraToDelete in camerasToDelete)
             {
-                CameraStreamService.cameraTextures.Keys.Remove(cameraToDelete);
-                CameraStreamService.cameraLastOperation.Keys.Remove(cameraToDelete);
+                CameraStreamService.cameraTextures.TryRemove(new KeyValuePair<string, CameraData>(cameraToDelete, CameraStreamService.cameraTextures[cameraToDelete]));
+                CameraStreamService.cameraLastOperation.TryRemove(new KeyValuePair<string, DateTime>(cameraToDelete, CameraStreamService.cameraLastOperation[cameraToDelete]));
             }
         }
 
@@ -90,7 +89,7 @@ namespace OfCourseIStillLoveYou.Server
             var numberOfCameras = CameraStreamService.cameraTextures.Count;
 
      
-            Console.WriteLine($"Total number of camera registered = {numberOfCameras}");
+            Console.WriteLine($"Total number of cameras registered = {numberOfCameras}");
 
             if(numberOfCameras > 0)
             {
