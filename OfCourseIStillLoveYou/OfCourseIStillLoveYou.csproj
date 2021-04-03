@@ -175,6 +175,9 @@ xcopy /E /Y "$(ProjectDir)Distribution\GameData" "%25KSP_DIR%25\GameData"
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>SET ModName=OfCourseIStillLoveYou
+RD /S /Q $(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\
+MD $(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\
+
 xcopy /E /Y "$(ProjectDir)"Dependencies\grpc_csharp_ext.dll "$(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\"</PreBuildEvent>
   </PropertyGroup>
 </Project>
