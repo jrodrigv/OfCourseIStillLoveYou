@@ -63,7 +63,7 @@ namespace OfCourseIStillLoveYou
             SetCameras();
 
             Enabled = true;
-
+            
         }
 
         public bool Enabled { get; set; }
@@ -92,34 +92,32 @@ namespace OfCourseIStillLoveYou
         }
 
         WaitForEndOfFrame frameEnd = new WaitForEndOfFrame();
-        //WaitForSeconds waitTime = new WaitForSeconds(0.0333F);
-        WaitForFixedUpdate waitFixedUpdate = new WaitForFixedUpdate();
+
         public IEnumerator SendCameraImage()
         {
             while (this.Enabled)
             {
-                //yield return waitTime;
                 yield return frameEnd;
 
                 Graphics.CopyTexture(this.TargetCamRenderTexture, this.texture2D);
 
-                AsyncGPUReadbackRequest request = AsyncGPUReadback.Request(this.texture2D);
-
-                while (!request.done)
+                AsyncGPUReadback.Request(this.texture2D, 0,
+                (request) =>
                 {
-                    yield return frameEnd;
+                    Task.Run(() => texture2D.LoadRawTextureData(request.GetData<byte>()))
+                        .ContinueWith((previous) => jpgTexture = ImageConversion.EncodeToJPG(texture2D))
+                        .ContinueWith((previous) =>
+                        GrpcClient.SendCameraTextureAsync(new CameraData()
+                        {
+                            CameraId = _id.ToString(),
+                            CameraName = name,
+                            Speed = speedString,
+                            Altitude = altitudeString,
+                            Texture = jpgTexture
+                        }));
                 }
-               
-                texture2D.LoadRawTextureData(request.GetData<byte>());
+                );
 
-                Task.Run(() => jpgTexture = ImageConversion.EncodeToJPG(texture2D)).ContinueWith( (texture) => GrpcClient.SendCameraTextureAsync(new CameraData()
-                {
-                    CameraId = _id.ToString(),
-                    CameraName = name,
-                    Speed = speedString,
-                    Altitude = altitudeString,
-                    Texture = jpgTexture
-                }));
             }
         }
 
