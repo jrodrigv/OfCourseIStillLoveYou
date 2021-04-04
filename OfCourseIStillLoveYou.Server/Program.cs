@@ -14,8 +14,7 @@ namespace OfCourseIStillLoveYou.Server
         const int Port = 50777;
         const string ExitCommand = "exit";
 
-        private static int count = 0;
-       
+    
         static void Main(string[] args)
         {
             Timer InfoTimer = new Timer(30000);
@@ -23,12 +22,6 @@ namespace OfCourseIStillLoveYou.Server
 
             InfoTimer.Enabled = true;
             InfoTimer.Start();
-
-            Timer CleanCamerasTimer = new Timer(1000);
-            CleanCamerasTimer.Elapsed += CleanCamerasTimer_Elapsed;
-
-            CleanCamerasTimer.Enabled = true;
-            CleanCamerasTimer.Start();
 
             var serverStub = new  CameraStreamService();
 
@@ -43,12 +36,12 @@ namespace OfCourseIStillLoveYou.Server
             server.Start();
 
 
-            Console.WriteLine("OfCourseIStillLoveYou.Server server has started, waiting for incoming requests. Type exit for closing the server");
+            Console.WriteLine($"OfCourseIStillLoveYou.Server is listening on {ServerEndpoint}:{Port}, waiting for incoming camera feed. Type exit for closing the server");
 
             var keyStroke = string.Empty;
       
            
-           while (keyStroke != ExitCommand)
+            while (keyStroke != ExitCommand)
             {
                 var random = new Random();
                 keyStroke = Console.ReadLine();
@@ -64,39 +57,19 @@ namespace OfCourseIStillLoveYou.Server
             server.ShutdownAsync().Wait();
         }
 
-        private static void CleanCamerasTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            List<string> camerasToDelete = new List<string>();
-
-
-            foreach(var camera in CameraStreamService.cameraLastOperation)
-            {
-                if (DateTime.Now.Subtract(camera.Value).TotalSeconds > 2)
-                {
-                    camerasToDelete.Add(camera.Key);
-                }
-            }
-
-            foreach (var cameraToDelete in camerasToDelete)
-            {
-                CameraStreamService.cameraTextures.TryRemove(new KeyValuePair<string, CameraData>(cameraToDelete, CameraStreamService.cameraTextures[cameraToDelete]));
-                CameraStreamService.cameraLastOperation.TryRemove(new KeyValuePair<string, DateTime>(cameraToDelete, CameraStreamService.cameraLastOperation[cameraToDelete]));
-            }
-        }
-
+      
         private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             var numberOfCameras = CameraStreamService.cameraTextures.Count;
 
-     
-            Console.WriteLine($"Total number of cameras registered = {numberOfCameras}");
-
             if(numberOfCameras > 0)
             {
-                Console.WriteLine($"Average Frames per second = {CameraStreamService.AverageFrames}");
+                Console.WriteLine($"Receiving video signal from {numberOfCameras} cameras. At {CameraStreamService.GetAverageFrames()} FPS");
             }
-          
-
+            else
+            {
+                Console.WriteLine($"Waiting for camera signal");
+            }
         }
     }
 }

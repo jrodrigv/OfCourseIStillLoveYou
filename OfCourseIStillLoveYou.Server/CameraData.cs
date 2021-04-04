@@ -11,5 +11,15 @@
 
         public byte[] Texture { get; set; }
 
+        public override string ToString()
+        {
+            return CameraName + CameraId;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ((CameraData)obj).CameraId.Equals(CameraId);
+        }
+
     }
 }

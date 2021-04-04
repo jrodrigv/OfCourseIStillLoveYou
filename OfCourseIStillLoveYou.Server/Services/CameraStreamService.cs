@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using OfCourseIStillLoveYou.Server;
 using System.Collections.Concurrent;
+using System.Timers;
 
 namespace OfCourseIStillLoveYou.Communication
 {
@@ -15,8 +16,55 @@ namespace OfCourseIStillLoveYou.Communication
 
         private static int accumulatedFrames = 0;
 
+        private static int lastAverageFrames = 0;
 
-        public static int AverageFrames => (int)Math.Round((decimal)((GetAccumulatedFrames() / timePeriod) / cameraTextures.Count), MidpointRounding.AwayFromZero);
+        public static ConcurrentDictionary<string, CameraData> cameraTextures = new ConcurrentDictionary<string, CameraData>();
+
+        public static ConcurrentDictionary<string, DateTime> cameraLastOperation = new ConcurrentDictionary<string, DateTime>();
+
+        public CameraStreamService()
+        {
+            int numProcs = Environment.ProcessorCount;
+            int concurrencyLevel = numProcs * 2;
+
+            cameraTextures = new ConcurrentDictionary<string, CameraData>(concurrencyLevel, initialCapacity);
+            cameraLastOperation = new ConcurrentDictionary<string, DateTime>(concurrencyLevel, initialCapacity);
+
+            Timer CleanCamerasTimer = new Timer(1000);
+            CleanCamerasTimer.Elapsed += CleanCamerasTimer_Elapsed;
+
+            CleanCamerasTimer.Enabled = true;
+            CleanCamerasTimer.Start();
+        }
+
+        private static void CleanCamerasTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            List<string> camerasToDelete = new List<string>();
+
+            foreach (var camera in cameraLastOperation)
+            {
+                if (DateTime.Now.Subtract(camera.Value).TotalSeconds > 2)
+                {
+                    camerasToDelete.Add(camera.Key);
+                }
+            }
+
+            foreach (var cameraToDelete in camerasToDelete)
+            {
+                cameraTextures.TryRemove(new KeyValuePair<string, CameraData>(cameraToDelete, CameraStreamService.cameraTextures[cameraToDelete]));
+                cameraLastOperation.TryRemove(new KeyValuePair<string, DateTime>(cameraToDelete, CameraStreamService.cameraLastOperation[cameraToDelete]));
+            }
+        }
+
+        public static int GetAverageFrames()
+        {
+
+            var newAverageFrames = (int)Math.Round((decimal)((GetAccumulatedFrames() / timePeriod) / cameraTextures.Count), MidpointRounding.AwayFromZero);
+
+            lastAverageFrames = newAverageFrames;
+
+            return newAverageFrames;
+        }
 
         private static int GetAccumulatedFrames()
         {
@@ -25,22 +73,6 @@ namespace OfCourseIStillLoveYou.Communication
             return result;
         }
 
-        public static ConcurrentDictionary<string, CameraData> cameraTextures = new ConcurrentDictionary<string, CameraData>();
-
-        public static ConcurrentDictionary<string, DateTime> cameraLastOperation = new ConcurrentDictionary<string, DateTime>();
-
-
-        public string SelectedCamera { get; set; }
-
-        private static bool once = false;
-        public CameraStreamService()
-        {
-            int numProcs = Environment.ProcessorCount;
-            int concurrencyLevel = numProcs * 2;
-
-            cameraTextures = new ConcurrentDictionary<string, CameraData>(concurrencyLevel, initialCapacity);
-            cameraLastOperation = new ConcurrentDictionary<string, DateTime>(concurrencyLevel, initialCapacity);
-        }
 
         public override Task<SendCameraStreamResult> SendCameraStream(SendCameraStreamRequest request, ServerCallContext context)
         {
@@ -78,6 +110,9 @@ namespace OfCourseIStillLoveYou.Communication
         {
             return Task.Run(() =>
             {
+                if (!cameraTextures.ContainsKey(request.CameraId)) 
+                    return new GetCameraTextureResult() { Texture = null };
+
                 GetCameraTextureResult result = new GetCameraTextureResult();
                 result.CameraId = request.CameraId;
                 result.Texture = Google.Protobuf.ByteString.CopyFrom(cameraTextures[request.CameraId].Texture);
@@ -89,15 +124,16 @@ namespace OfCourseIStillLoveYou.Communication
             });
         }
 
+        public override Task<GetAverageFpsResult> GetAverageFps(GetAverageFpsRequest request, ServerCallContext context)
+        {
+            return Task.Run(() =>
+            {
+                GetAverageFpsResult result = new GetAverageFpsResult();
+                result.AverageFps = lastAverageFrames;
 
-        //public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
-        //{
+                return result;
+            });
+        }
 
-        //    Console.WriteLine("Hello request received");
-        //    return Task.FromResult(new HelloReply
-        //    {
-        //        Message = "Hello " + request.Name
-        //    });
-        //}
     }
 }

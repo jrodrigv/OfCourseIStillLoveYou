@@ -9,6 +9,7 @@ service CameraStream {
   rpc SendCameraStream (SendCameraStreamRequest) returns (SendCameraStreamResult);
   rpc GetActiveCameraIds (GetActiveCameraIdsRequest) returns (GetActiveCameraIdsResult);
   rpc GetCameraTexture (GetCameraTextureRequest) returns (GetCameraTextureResult);
+  rpc GetAverageFps (GetAverageFpsRequest)returns (GetAverageFpsResult);
 }
 
 
@@ -44,8 +45,14 @@ message GetCameraTextureResult {
     string speed = 3;
     string altitude = 4;
     bytes texture = 5;
-
 }
 
+message GetAverageFpsRequest {
+   
+}
+
+message GetAverageFpsResult {
+   int32 averageFps = 1;
+}
 
 

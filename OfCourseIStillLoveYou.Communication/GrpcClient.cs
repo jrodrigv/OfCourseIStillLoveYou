@@ -10,6 +10,7 @@ namespace OfCourseIStillLoveYou.Communication
     {
         public static CameraStream.CameraStreamClient Client { get; set; }
 
+
         public static void ConnectToServer()
         {
             var channel = new Channel("localhost", 50777, ChannelCredentials.Insecure);
@@ -34,36 +35,32 @@ namespace OfCourseIStillLoveYou.Communication
             return cameraIds;
         }
 
-
-        //public static byte[] GetCameraTextureAsync(string cameraId)
-        //{
-
-        //    var cameraTextureProto = Client.GetCameraTexture(new GetCameraTextureRequest() { CameraId = cameraId });
-
-        //    byte[] cameraTexture = new byte[cameraTextureProto.CalculateSize()];
-
-        //    cameraTextureProto.Texture.CopyTo(cameraTexture, 0);
-           
-        //    return cameraTexture;
-        //}
-
-        public static CameraData GetCameraDataAsync(string cameraId)
+        public static Task<CameraData> GetCameraDataAsync(string cameraId)
         {
-
-            var cameraTextureProto = Client.GetCameraTexture(new GetCameraTextureRequest() { CameraId = cameraId });
-
-            byte[] cameraTexture = new byte[cameraTextureProto.Texture.Length];
-
-            cameraTextureProto.Texture.CopyTo(cameraTexture, 0);
-
-            return new CameraData()
+            var cameraTextureProto = Client.GetCameraTextureAsync(new GetCameraTextureRequest() { CameraId = cameraId });
+    
+            return cameraTextureProto.ResponseAsync.ContinueWith((previous) =>
             {
-                CameraId = cameraTextureProto.CameraId,
-                CameraName = cameraTextureProto.CameraName,
-                Altitude = cameraTextureProto.Altitude,
-                Speed = cameraTextureProto.Speed,
-                Texture = cameraTexture
-            };
+                byte[] cameraTexture = new byte[previous.Result.Texture.Length];
+
+                previous.Result.Texture.CopyTo(cameraTexture, 0);
+
+                return new CameraData()
+                {
+                    CameraId = previous.Result.CameraId,
+                    CameraName = previous.Result.CameraName,
+                    Altitude = previous.Result.Altitude,
+                    Speed = previous.Result.Speed,
+                    Texture = cameraTexture,
+                };
+            });
+        }
+
+        public static Task<int>  GetCurrentFPSAsync()
+        {
+            var result = Client.GetAverageFpsAsync(new GetAverageFpsRequest());
+
+            return result.ResponseAsync.ContinueWith((previous) => previous.Result.AverageFps);
         }
     }
 }
