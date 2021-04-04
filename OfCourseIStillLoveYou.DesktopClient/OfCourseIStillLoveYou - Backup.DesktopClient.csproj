@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
@@ -13,14 +13,6 @@
     <ProjectReference Include="..\OfCourseIStillLoveYou.Communication\OfCourseIStillLoveYou.Communication.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="OfCourseIStillLoveYou.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <AvaloniaResource Include="Assets\**"/>
+	<AvaloniaResource Include="Assets\**"/>
   </ItemGroup>
 </Project>

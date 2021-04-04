@@ -1,0 +1,21 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800" Width="800" Height="800"
+        x:Class="OfCourseIStillLoveYou.DesktopClient.MainWindow"
+        Title="OfCourseIStillLoveYou.DesktopClient">
+
+  
+  <Panel Background="Black">
+    <Image Name="imgCameraTexture" Stretch="Uniform" Source="/Assets/OfCourseIStillLoveYou.png" ClipToBounds="true" ></Image>
+    <DockPanel  Margin="10" ClipToBounds="True" >
+      <Label Content="SELECT A CAMERA" Foreground="White" FontSize="14" FontFamily="Calibri" FontWeight="400"></Label>
+      <ComboBox Name="cbCameras" Margin="5,0,0,0" MinWidth="150"></ComboBox>
+    </DockPanel>
+
+    <Label Foreground="White" FontSize="34" Margin="50" FontFamily="Calibri" FontWeight="400" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+      <TextBlock Name="TextInfo" Text="SPEEED ALTITUDE" TextWrapping="Wrap" MaxWidth="300" TextAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled"></TextBlock>
+    </Label>
+    </Panel>
+</Window>
