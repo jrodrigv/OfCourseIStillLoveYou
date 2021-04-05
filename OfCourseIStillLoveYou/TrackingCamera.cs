@@ -240,7 +240,7 @@ namespace OfCourseIStillLoveYou
 
             var imageRect = new Rect(2, 20, _adjCamImageSize, _adjCamImageSize);
 
-         
+
 
             GUI.DrawTexture(imageRect, TargetCamRenderTexture, ScaleMode.StretchToFill, false);
 
@@ -254,22 +254,16 @@ namespace OfCourseIStillLoveYou
             dataStyle.fontSize = (int)Mathf.Clamp(16 * TargetWindowScale, 9, 16);
             //float dataStartX = stabilStartX + stabilizeRect.width + 8;
             Rect targetRangeRect = new Rect(imageRect.x, (_adjCamImageSize * 0.94f) - (int)Mathf.Clamp(18 * TargetWindowScale, 9, 18), _adjCamImageSize, (int)Mathf.Clamp(18 * TargetWindowScale, 10, 18));
-            
-            float  altitudeInKm = (float) Math.Round(this._hullcamera.vessel.altitude / 1000f, 1);
-            int speed = (int) Math.Round(this._hullcamera.vessel.speed * 3.6f,0);
 
             StringBuilder sb = new StringBuilder();
-
-            this.altitudeString = "ALTITUDE: " + altitudeInKm.ToString("0.0") + " KM";
-            this.speedString = "SPEED: " + speed + " KM/H";
             sb.AppendLine(this.altitudeString);
             sb.AppendLine(this.speedString);
 
             GUI.Label(targetRangeRect, sb.ToString(), dataStyle);
 
             if (NeedToCaptureCamera)
-            {           
-              
+            {
+
             }
 
             NeedToCaptureCamera = !NeedToCaptureCamera;
@@ -291,9 +285,17 @@ namespace OfCourseIStillLoveYou
                     UpdateTargetScale(diff);
                     ResizeTargetWindow();
                 }
-            
+
             //ResetZoomKeys();
             RepositionWindow(ref _windowRect);
+        }
+
+        public void CalculateSpeedAltitude()
+        {
+            float altitudeInKm = (float)Math.Round(this._hullcamera.vessel.altitude / 1000f, 1);
+            int speed = (int)Math.Round(this._hullcamera.vessel.speed * 3.6f, 0);
+            this.altitudeString = "ALTITUDE: " + altitudeInKm.ToString("0.0") + " KM";
+            this.speedString = "SPEED: " + speed + " KM/H";
         }
 
         private void UpdateTargetScale(float diff)

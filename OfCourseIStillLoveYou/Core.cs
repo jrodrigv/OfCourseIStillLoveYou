@@ -72,6 +72,7 @@ namespace OfCourseIStillLoveYou
                 if (trackedCamerasValue.Enabled)
                 {
                     trackedCamerasValue.RenderCameras();
+                    trackedCamerasValue.CalculateSpeedAltitude();
                 }
             }
         }

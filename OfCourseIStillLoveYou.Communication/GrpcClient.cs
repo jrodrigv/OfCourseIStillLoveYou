@@ -41,6 +41,14 @@ namespace OfCourseIStillLoveYou.Communication
     
             return cameraTextureProto.ResponseAsync.ContinueWith((previous) =>
             {
+                if (previous.Result.Texture.Length == 0)
+                {
+                    return new CameraData()
+                    {
+                        Texture = null
+                    };
+                }
+
                 byte[] cameraTexture = new byte[previous.Result.Texture.Length];
 
                 previous.Result.Texture.CopyTo(cameraTexture, 0);

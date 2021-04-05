@@ -111,7 +111,7 @@ namespace OfCourseIStillLoveYou.Communication
             return Task.Run(() =>
             {
                 if (!cameraTextures.ContainsKey(request.CameraId)) 
-                    return new GetCameraTextureResult() { Texture = null };
+                    return new GetCameraTextureResult() { Texture = Google.Protobuf.ByteString.Empty };
 
                 GetCameraTextureResult result = new GetCameraTextureResult();
                 result.CameraId = request.CameraId;
