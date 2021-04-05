@@ -44,7 +44,6 @@ namespace OfCourseIStillLoveYou
         public RenderTexture TargetCamRenderTexture;
         private Texture2D texture2D = new Texture2D(768, 768, TextureFormat.ARGB32, false);
         private byte[] jpgTexture;
-        private NativeArray<byte> nativeTexture = new NativeArray<byte>();
         private bool NeedToCaptureCamera = true;
 
         public TrackingCamera(int id, MuMechModuleHullCamera hullcamera)
@@ -124,6 +123,11 @@ namespace OfCourseIStillLoveYou
 
         private void SetCameras()
         {
+            foreach (Camera cam in Camera.allCameras)
+            {
+                Debug.Log("JR CAMERA: " + cam.name);
+            }
+
             var cam1Obj = new GameObject();
             var partNearCamera = cam1Obj.AddComponent<Camera>();
 
@@ -139,9 +143,6 @@ namespace OfCourseIStillLoveYou
             partNearCamera.targetTexture = TargetCamRenderTexture;
             _cameras[0] = partNearCamera;
 
-           //var cameraStreaming = cam1Obj.AddComponent<CameraStreaming>();
-           // cameraStreaming.CameraId = this._id;
-           // cameraStreaming.CameraTexture = TargetCamRenderTexture;
 
             //Scatterer shadow fix
             var partialUnifiedCameraDepthBuffer = (PartialDepthBuffer) _cameras[0].gameObject.AddComponent(typeof(PartialDepthBuffer));
@@ -154,6 +155,36 @@ namespace OfCourseIStillLoveYou
             PostProcessVolume volume = _cameras[0].gameObject.AddOrGetComponent<PostProcessVolume>();
             volume.isGlobal = true;
             volume.priority = 100;
+
+           // var camVEOverlay = new GameObject();
+           // var partVEOverlay = camVEOverlay.AddComponent<Camera>();
+           // var cameraVEOverlay = FindCamera("Camera VE Overlay");
+           // partVEOverlay.CopyFrom(cameraVEOverlay);
+           // partVEOverlay.name = "jrVEOverlay";
+           // partVEOverlay.transform.parent = _hullcamera.cameraTransformName.Length <= 0
+           //     ? _hullcamera.part.transform
+           //     : _hullcamera.part.FindModelTransform(_hullcamera.cameraTransformName);
+           // partVEOverlay.transform.localRotation =
+           //    Quaternion.LookRotation(_hullcamera.cameraForward, _hullcamera.cameraUp);
+           // partVEOverlay.transform.localPosition = _hullcamera.cameraPosition;
+           // partVEOverlay.fieldOfView = _hullcamera.cameraFoV;
+           // partVEOverlay.targetTexture = TargetCamRenderTexture;
+           // _cameras[1] = partVEOverlay;
+
+           //var camVEUnderlay = new GameObject();
+           // var partVEUnderlay = camVEUnderlay.AddComponent<Camera>();
+           // var cameraVEUnderlay = FindCamera("Camera VE Underlay");
+           // partVEUnderlay.CopyFrom(cameraVEUnderlay);
+           // partVEUnderlay.name = "jrVEUnderlay";
+           // partVEUnderlay.transform.parent = _hullcamera.cameraTransformName.Length <= 0
+           //     ? _hullcamera.part.transform
+           //     : _hullcamera.part.FindModelTransform(_hullcamera.cameraTransformName);
+           // partVEUnderlay.transform.localRotation =
+           //    Quaternion.LookRotation(_hullcamera.cameraForward, _hullcamera.cameraUp);
+           // partVEUnderlay.transform.localPosition = _hullcamera.cameraPosition;
+           // partVEUnderlay.fieldOfView = _hullcamera.cameraFoV;
+           // partVEUnderlay.targetTexture = TargetCamRenderTexture;
+           // _cameras[2] = partVEUnderlay;
 
             var cam2Obj = new GameObject();
             var partScaledCamera = cam2Obj.AddComponent<Camera>();
@@ -169,6 +200,8 @@ namespace OfCourseIStillLoveYou
             partScaledCamera.transform.localScale = Vector3.one;
             partScaledCamera.targetTexture = TargetCamRenderTexture;
             _cameras[1] = partScaledCamera;
+
+
             var camRotator = cam2Obj.AddComponent<TgpCamRotator>();
             camRotator.NearCamera = partNearCamera;
 
@@ -187,6 +220,7 @@ namespace OfCourseIStillLoveYou
             galaxyCam.fieldOfView = 60;
             galaxyCam.targetTexture = TargetCamRenderTexture;
             _cameras[2] = galaxyCam;
+
             var camRotatorgalaxy = galaxyCamObj.AddComponent<TgpCamRotator>();
             camRotatorgalaxy.NearCamera = partNearCamera;
 
@@ -335,7 +369,7 @@ namespace OfCourseIStillLoveYou
             {
                 if (_cameras[i] == null) return;
 
-                if (i > 0) _cameras[i].fieldOfView = 60;
+                //if (i > 0) _cameras[i].fieldOfView = 60;
 
                 _cameras[i].Render();
             }

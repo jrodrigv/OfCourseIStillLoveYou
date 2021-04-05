@@ -15,9 +15,7 @@
     </DockPanel>
 
     <Label Foreground="White" FontSize="34" Margin="50" FontFamily="Calibri" FontWeight="400" VerticalAlignment="Bottom" HorizontalAlignment="Center">
-     
-        <TextBlock Name="TextInfo" Text="SPEEED ALTITUDE" TextWrapping="Wrap" MaxWidth="300" TextAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled"></TextBlock> 
-  
+        <TextBlock Name="TextInfo" Text="SPEEED ALTITUDE" TextWrapping="Wrap" MaxWidth="400" TextAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled"></TextBlock>
     </Label>
     </Panel>
 </Window>

@@ -40,10 +40,6 @@ namespace OfCourseIStillLoveYou
             GameEvents.onShowUI.Add(GameUiEnable);
             _gameUiToggle = true;
 
-            foreach (Camera cam in Camera.allCameras)
-            {
-                Debug.Log("JR CAMERA: " + cam.name);
-            }
         }
 
         // ReSharper disable once InconsistentNaming
