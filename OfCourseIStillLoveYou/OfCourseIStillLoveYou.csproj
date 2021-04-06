@@ -121,6 +121,7 @@
   <ItemGroup>
     <Compile Include="CameraStreaming.cs" />
     <Compile Include="PartialDepthBuffer.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="TgpCamRotator.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Gui.cs" />

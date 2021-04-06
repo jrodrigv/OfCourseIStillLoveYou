@@ -11,9 +11,9 @@ namespace OfCourseIStillLoveYou.Communication
         public static CameraStream.CameraStreamClient Client { get; set; }
 
 
-        public static void ConnectToServer()
+        public static void ConnectToServer(string endpoint = "localhost", int port = 50777)
         {
-            var channel = new Channel("localhost", 50777, ChannelCredentials.Insecure);
+            var channel = new Channel(endpoint, port, ChannelCredentials.Insecure);
 
             Client = new CameraStream.CameraStreamClient(channel);
         }

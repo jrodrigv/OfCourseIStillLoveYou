@@ -10,14 +10,22 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Text.Json;
+using System.Text.Json.Serialization;
 namespace OfCourseIStillLoveYou.DesktopClient
 {
     public class MainWindow : Window
     {
+        const int delay = 33;
+        const string settingPath = "settings.json";
+        const string endpoint = "localhost";
+        const int port = 50777;
+
         private Bitmap initialImage;
         private string currentCamera;
         private Bitmap texture;
+       
+        private SettingsPOCO settings;
 
         public CameraData curretCameraData { get; private set; }
 
@@ -33,9 +41,23 @@ namespace OfCourseIStillLoveYou.DesktopClient
         {
             AvaloniaXamlLoader.Load(this);
             StoreInitialImage();
-            GrpcClient.ConnectToServer();
+            ReadSettings();
+            GrpcClient.ConnectToServer(settings.EndPoint, settings.Port);
             Task.Run(CameraFetchWorker);
             Task.Run(CameraTextureWorker);
+        }
+
+        private void ReadSettings()
+        {
+            try
+            {
+                var settingsText = File.ReadAllText(settingPath);
+                settings = JsonSerializer.Deserialize<SettingsPOCO>(settingsText);
+            }
+            catch (Exception)
+            {
+                settings = new SettingsPOCO() { EndPoint = endpoint, Port = port };
+            }
         }
 
         private void StoreInitialImage()
@@ -47,7 +69,7 @@ namespace OfCourseIStillLoveYou.DesktopClient
         {
             while (true)
             {
-                Task.Delay(33).Wait();
+                Task.Delay(delay).Wait();
 
                 if (String.IsNullOrEmpty(currentCamera))
                 {
@@ -149,5 +171,11 @@ namespace OfCourseIStillLoveYou.DesktopClient
             var cbCameras = this.FindControl<ComboBox>("cbCameras");
             cbCameras.Items = cameraIds;    
         }
+    }
+
+    public class SettingsPOCO
+    {
+        public string EndPoint { get; set; }
+        public int Port { get; set; }
     }
 }

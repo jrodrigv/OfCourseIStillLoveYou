@@ -17,7 +17,7 @@ namespace OfCourseIStillLoveYou
 
         private void Awake()
         {
-            GrpcClient.ConnectToServer();
+            GrpcClient.ConnectToServer(Settings.EndPoint,Settings.Port);
         }
 
 

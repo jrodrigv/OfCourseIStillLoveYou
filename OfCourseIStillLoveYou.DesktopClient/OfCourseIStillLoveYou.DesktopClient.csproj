@@ -20,6 +20,9 @@
     <None Update="OfCourseIStillLoveYou.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="settings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
