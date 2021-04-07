@@ -21,6 +21,7 @@ namespace OfCourseIStillLoveYou
     {
         private static readonly float buttonHeight = 18;
         private static readonly float gap = 2;
+        private static float controlsStartY = 22;
 
         //private Camera partRealCamera;
 
@@ -44,7 +45,6 @@ namespace OfCourseIStillLoveYou
         public RenderTexture TargetCamRenderTexture;
         private Texture2D texture2D = new Texture2D(768, 768, TextureFormat.ARGB32, false);
         private byte[] jpgTexture;
-        private bool NeedToCaptureCamera = true;
 
         public TrackingCamera(int id, MuMechModuleHullCamera hullcamera)
         {
@@ -79,6 +79,7 @@ namespace OfCourseIStillLoveYou
         public float TargetWindowScale { get; set; } = 1;
         public string altitudeString { get; private set; }
         public string speedString { get; private set; }
+        public bool _StreamingEnabled { get; private set; }
 
         private Camera FindCamera(string cameraName)
         {
@@ -94,10 +95,12 @@ namespace OfCourseIStillLoveYou
 
         public IEnumerator SendCameraImage()
         {
-            while (this.Enabled)
+            while (Enabled)
             {
                 yield return frameEnd;
 
+                if (!_StreamingEnabled) continue;
+              
                 Graphics.CopyTexture(this.TargetCamRenderTexture, this.texture2D);
 
                 AsyncGPUReadback.Request(this.texture2D, 0,
@@ -123,11 +126,6 @@ namespace OfCourseIStillLoveYou
 
         private void SetCameras()
         {
-            foreach (Camera cam in Camera.allCameras)
-            {
-                Debug.Log("JR CAMERA: " + cam.name);
-            }
-
             var cam1Obj = new GameObject();
             var partNearCamera = cam1Obj.AddComponent<Camera>();
 
@@ -151,40 +149,11 @@ namespace OfCourseIStillLoveYou
             //TUFX
             PostProcessLayer layer = _cameras[0].gameObject.AddOrGetComponent<PostProcessLayer>();
             layer.Init(TexturesUnlimitedFXLoader.Resources);
+
             layer.volumeLayer = ~0;
             PostProcessVolume volume = _cameras[0].gameObject.AddOrGetComponent<PostProcessVolume>();
             volume.isGlobal = true;
             volume.priority = 100;
-
-           // var camVEOverlay = new GameObject();
-           // var partVEOverlay = camVEOverlay.AddComponent<Camera>();
-           // var cameraVEOverlay = FindCamera("Camera VE Overlay");
-           // partVEOverlay.CopyFrom(cameraVEOverlay);
-           // partVEOverlay.name = "jrVEOverlay";
-           // partVEOverlay.transform.parent = _hullcamera.cameraTransformName.Length <= 0
-           //     ? _hullcamera.part.transform
-           //     : _hullcamera.part.FindModelTransform(_hullcamera.cameraTransformName);
-           // partVEOverlay.transform.localRotation =
-           //    Quaternion.LookRotation(_hullcamera.cameraForward, _hullcamera.cameraUp);
-           // partVEOverlay.transform.localPosition = _hullcamera.cameraPosition;
-           // partVEOverlay.fieldOfView = _hullcamera.cameraFoV;
-           // partVEOverlay.targetTexture = TargetCamRenderTexture;
-           // _cameras[1] = partVEOverlay;
-
-           //var camVEUnderlay = new GameObject();
-           // var partVEUnderlay = camVEUnderlay.AddComponent<Camera>();
-           // var cameraVEUnderlay = FindCamera("Camera VE Underlay");
-           // partVEUnderlay.CopyFrom(cameraVEUnderlay);
-           // partVEUnderlay.name = "jrVEUnderlay";
-           // partVEUnderlay.transform.parent = _hullcamera.cameraTransformName.Length <= 0
-           //     ? _hullcamera.part.transform
-           //     : _hullcamera.part.FindModelTransform(_hullcamera.cameraTransformName);
-           // partVEUnderlay.transform.localRotation =
-           //    Quaternion.LookRotation(_hullcamera.cameraForward, _hullcamera.cameraUp);
-           // partVEUnderlay.transform.localPosition = _hullcamera.cameraPosition;
-           // partVEUnderlay.fieldOfView = _hullcamera.cameraFoV;
-           // partVEUnderlay.targetTexture = TargetCamRenderTexture;
-           // _cameras[2] = partVEUnderlay;
 
             var cam2Obj = new GameObject();
             var partScaledCamera = cam2Obj.AddComponent<Camera>();
@@ -278,6 +247,10 @@ namespace OfCourseIStillLoveYou
 
             GUI.DrawTexture(imageRect, TargetCamRenderTexture, ScaleMode.StretchToFill, false);
 
+            // Right side control buttons
+            DrawSideControlButtons(imageRect);
+
+
             GUIStyle dataStyle = new GUIStyle();
             dataStyle.alignment = TextAnchor.MiddleCenter;
             dataStyle.normal.textColor = Color.white;
@@ -295,13 +268,7 @@ namespace OfCourseIStillLoveYou
 
             GUI.Label(targetRangeRect, sb.ToString(), dataStyle);
 
-            if (NeedToCaptureCamera)
-            {
-
-            }
-
-            NeedToCaptureCamera = !NeedToCaptureCamera;
-
+    
             //resizing
             var resizeRect =
                 new Rect(_windowWidth - 18, _windowHeight - 18, 16, 16);
@@ -324,7 +291,38 @@ namespace OfCourseIStillLoveYou
             RepositionWindow(ref _windowRect);
         }
 
-        public void CalculateSpeedAltitude()
+        private void DrawSideControlButtons(Rect imageRect)
+        {
+            GUIStyle dataStyle = new GUIStyle();
+            dataStyle.alignment = TextAnchor.MiddleCenter;
+            dataStyle.normal.textColor = Color.white;
+            GUIStyle buttonStyle = new GUIStyle(HighLogic.Skin.button);
+            buttonStyle.fontSize = 10;
+            buttonStyle.wordWrap = true;
+
+            float line = buttonHeight + gap;
+            float buttonWidth = 3 * buttonHeight + 4 * gap;
+            //groundStablize button
+            float startX = imageRect.width + 3 * gap;
+            Rect streamingRect = new Rect(startX, controlsStartY, buttonWidth, buttonHeight + line);
+            
+            if (!this._StreamingEnabled)
+            {
+                if (GUI.Button(streamingRect, "Enable streaming", buttonStyle))
+                {
+                    this._StreamingEnabled = true;
+                }
+            }
+            else
+            {
+                if (GUI.Button(streamingRect, "Disable streaming", buttonStyle))
+                {
+                    this._StreamingEnabled = false;
+                }
+            }
+        }
+
+            public void CalculateSpeedAltitude()
         {
             float altitudeInKm = (float)Math.Round(this._hullcamera.vessel.altitude / 1000f, 1);
             int speed = (int)Math.Round(this._hullcamera.vessel.speed * 3.6f, 0);
