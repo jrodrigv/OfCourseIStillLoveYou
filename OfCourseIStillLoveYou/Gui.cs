@@ -48,9 +48,36 @@ namespace OfCourseIStillLoveYou
             if (GuiEnabled && _gameUiToggle)
             {
                 _windowRect = GUI.Window(1850, _windowRect, GuiWindow, "");
+
+                RemoveDisabledCameras();
                 UpdateAllCameras();
             }
             
+        }
+
+        private void RemoveDisabledCameras()
+        {
+            var camerasToDelete = new List<int>();
+
+            foreach (var trackingCamera in Core.TrackedCameras)
+            {
+                if(CameraHasToBeDeleted(trackingCamera.Value))
+                {
+                    trackingCamera.Value.Disable();
+                    camerasToDelete.Add(trackingCamera.Value.Id);
+                }
+            }
+
+            foreach (var cameraId in camerasToDelete)
+            {
+                Core.TrackedCameras.Remove(cameraId);
+            }
+
+        }
+
+        private bool CameraHasToBeDeleted(TrackingCamera trackingCamera)
+        {
+            return (!trackingCamera.Enabled || trackingCamera.Vessel == null || !trackingCamera.Vessel.loaded);
         }
 
         private void GuiWindow(int windowId)

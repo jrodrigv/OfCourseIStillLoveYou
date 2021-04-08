@@ -46,6 +46,10 @@ namespace OfCourseIStillLoveYou
         private Texture2D texture2D = new Texture2D(768, 768, TextureFormat.ARGB32, false);
         private byte[] jpgTexture;
 
+        public Vessel Vessel => _hullcamera?.vessel;
+
+        public int Id => _id;
+
         public TrackingCamera(int id, MuMechModuleHullCamera hullcamera)
         {
             _id = id;
@@ -130,6 +134,7 @@ namespace OfCourseIStillLoveYou
             var partNearCamera = cam1Obj.AddComponent<Camera>();
 
             partNearCamera.CopyFrom(Camera.allCameras.FirstOrDefault(cam => cam.name == "Camera 00"));
+
             partNearCamera.name = "jrNear";
             partNearCamera.transform.parent = _hullcamera.cameraTransformName.Length <= 0
                 ? _hullcamera.part.transform
@@ -141,6 +146,7 @@ namespace OfCourseIStillLoveYou
             partNearCamera.targetTexture = TargetCamRenderTexture;
             _cameras[0] = partNearCamera;
 
+            var a = Camera.current;
 
             //Scatterer shadow fix
             var partialUnifiedCameraDepthBuffer = (PartialDepthBuffer) _cameras[0].gameObject.AddComponent(typeof(PartialDepthBuffer));
@@ -322,7 +328,7 @@ namespace OfCourseIStillLoveYou
             }
         }
 
-            public void CalculateSpeedAltitude()
+        public void CalculateSpeedAltitude()
         {
             float altitudeInKm = (float)Math.Round(this._hullcamera.vessel.altitude / 1000f, 1);
             int speed = (int)Math.Round(this._hullcamera.vessel.speed * 3.6f, 0);
@@ -367,15 +373,13 @@ namespace OfCourseIStillLoveYou
             {
                 if (_cameras[i] == null) return;
 
-                //if (i > 0) _cameras[i].fieldOfView = 60;
-
                 _cameras[i].Render();
             }
         }
 
         public void Disable()
         {
-            Core.TrackedCameras.Remove(_id);
+            _StreamingEnabled = false;
             Enabled = false;
 
             foreach (var camera in _cameras)

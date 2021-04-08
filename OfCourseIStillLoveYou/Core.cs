@@ -41,24 +41,6 @@ namespace OfCourseIStillLoveYou
             return result;
         }
 
-
-        public static List<Vessel> GetAllVesselForTracking(MuMechModuleHullCamera cameraModule)
-        {
-            List<Vessel> result = new List<Vessel>();
-
-            foreach (var vessel in FlightGlobals.VesselsLoaded)
-            {
-                if(!vessel.IsControllable) continue;
-                if (cameraModule.vessel == vessel) continue;
-                
-                if (Physics.Linecast(cameraModule.vessel.CoM, vessel.CoM, 1 << 15)) continue;
-                
-                result.Add(vessel);
-            }
-
-            return result;
-        }
-
         void LateUpdate()
         {
             RenderCameras();
