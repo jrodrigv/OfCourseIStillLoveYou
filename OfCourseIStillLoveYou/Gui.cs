@@ -48,11 +48,15 @@ namespace OfCourseIStillLoveYou
             if (GuiEnabled && _gameUiToggle)
             {
                 _windowRect = GUI.Window(1850, _windowRect, GuiWindow, "");
-
-                RemoveDisabledCameras();
-                UpdateAllCameras();
+                UpdateAllCameras();   
             }
             
+        }
+
+        void LateUpdate()
+        {
+
+            RemoveDisabledCameras();
         }
 
         private void RemoveDisabledCameras()
@@ -77,7 +81,7 @@ namespace OfCourseIStillLoveYou
 
         private bool CameraHasToBeDeleted(TrackingCamera trackingCamera)
         {
-            return (!trackingCamera.Enabled || trackingCamera.Vessel == null || !trackingCamera.Vessel.loaded);
+            return (!trackingCamera.Enabled ||  trackingCamera.Vessel == null || !trackingCamera.Vessel.loaded);
         }
 
         private void GuiWindow(int windowId)

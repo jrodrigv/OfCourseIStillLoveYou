@@ -29,6 +29,8 @@ namespace OfCourseIStillLoveYou.DesktopClient
 
         public CameraData curretCameraData { get; private set; }
 
+        private bool StatusUnstable = false;
+
         public MainWindow()
        {
             InitializeComponent();
@@ -102,10 +104,12 @@ namespace OfCourseIStillLoveYou.DesktopClient
                         
                         if(curretCameraData.Texture == null)
                         {
-                            NotifyUnstableCameraFeed();
+                            StatusUnstable = true;
                         }
                         else
                         {
+                            StatusUnstable = false;
+
                             TextBlock textInfo = this.FindControl<TextBlock>("TextInfo");
                             StringBuilder sb = new StringBuilder();
                             sb.AppendLine(curretCameraData.Altitude);
@@ -125,6 +129,12 @@ namespace OfCourseIStillLoveYou.DesktopClient
                 try
                 {
                     var cameraIds = GrpcClient.GetCameraIds();
+
+                    if (StatusUnstable)
+                    {
+                        Dispatcher.UIThread.InvokeAsync(() => NotifyUnstableCameraFeed());
+                        continue;
+                    }
                     if(cameraIds == null || cameraIds.Count == 0)
                     {
                         Dispatcher.UIThread.InvokeAsync(() => NotifyWaitingForCameraFeed());

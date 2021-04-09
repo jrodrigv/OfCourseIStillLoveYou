@@ -104,6 +104,7 @@ namespace OfCourseIStillLoveYou
                 yield return frameEnd;
 
                 if (!_StreamingEnabled) continue;
+                if (!Enabled) yield return null;
               
                 Graphics.CopyTexture(this.TargetCamRenderTexture, this.texture2D);
 
@@ -205,13 +206,13 @@ namespace OfCourseIStillLoveYou
 
         public void CreateGui()
         {
+            if (!Enabled) return;
+
             if (_hullcamera == null || _hullcamera.vessel == null)
             {
                 Disable();
                 return;
             }
-
-            if (!Enabled) return;
 
             name = _hullcamera.vessel.GetDisplayName() + "." + _hullcamera.cameraName;
 
@@ -379,17 +380,16 @@ namespace OfCourseIStillLoveYou
 
         public void Disable()
         {
-            _StreamingEnabled = false;
             Enabled = false;
-
+            _StreamingEnabled = false;
+            
             foreach (var camera in _cameras)
             {
-                if (camera == null) continue;
-
-                camera.enabled = false;
+                if (camera != null)
+                {
+                    camera.enabled = false;
+                }
             }
-
-            _cameras = null;
         }
     }
 }
