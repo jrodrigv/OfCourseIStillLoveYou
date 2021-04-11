@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HullcamVDS;
 using OfCourseIStillLoveYou.Client;
-using scatterer;
 using TUFX;
 using TUFX.PostProcessing;
-using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.PostProcessing;
-
 
 namespace OfCourseIStillLoveYou
 {
@@ -21,7 +17,7 @@ namespace OfCourseIStillLoveYou
     {
         private static readonly float buttonHeight = 18;
         private static readonly float gap = 2;
-        private static float controlsStartY = 22;
+        private static readonly float controlsStartY = 22;
 
         //private Camera partRealCamera;
 
@@ -30,29 +26,24 @@ namespace OfCourseIStillLoveYou
             GameDatabase.Instance.GetTexture("OfCourseIStillLoveYou/Textures/" + "resizeSquare", false);
 
         private readonly MuMechModuleHullCamera _hullcamera;
-        private readonly int _id;
         private readonly float camImageSize = 360;
         private float _adjCamImageSize = 360;
 
 
-        private Camera[] _cameras = new Camera[3];
+        private readonly Camera[] _cameras = new Camera[3];
         private float _windowHeight;
-
-        public string name { get; private set; }
 
         private Rect _windowRect;
         private float _windowWidth;
-        public RenderTexture TargetCamRenderTexture;
-        private Texture2D texture2D = new Texture2D(768, 768, TextureFormat.ARGB32, false);
+
+        private readonly WaitForEndOfFrame frameEnd = new WaitForEndOfFrame();
         private byte[] jpgTexture;
-
-        public Vessel Vessel => _hullcamera?.vessel;
-
-        public int Id => _id;
+        public RenderTexture TargetCamRenderTexture;
+        private readonly Texture2D texture2D = new Texture2D(768, 768, TextureFormat.ARGB32, false);
 
         public TrackingCamera(int id, MuMechModuleHullCamera hullcamera)
         {
-            _id = id;
+            Id = id;
             _hullcamera = hullcamera;
 
             TargetCamRenderTexture = new RenderTexture(768, 768, 24, RenderTextureFormat.ARGB32);
@@ -66,8 +57,13 @@ namespace OfCourseIStillLoveYou
             SetCameras();
 
             Enabled = true;
-            
         }
+
+        public string Name { get; private set; }
+
+        public Vessel Vessel => _hullcamera?.vessel;
+
+        public int Id { get; }
 
         public bool Enabled { get; set; }
 
@@ -81,9 +77,9 @@ namespace OfCourseIStillLoveYou
         public bool WindowIsOpen { get; set; }
 
         public float TargetWindowScale { get; set; } = 1;
-        public string altitudeString { get; private set; }
-        public string speedString { get; private set; }
-        public bool _StreamingEnabled { get; private set; }
+        public string AltitudeString { get; private set; }
+        public string SpeedString { get; private set; }
+        public bool StreamingEnabled { get; private set; }
 
         private Camera FindCamera(string cameraName)
         {
@@ -95,36 +91,33 @@ namespace OfCourseIStillLoveYou
             return null;
         }
 
-        WaitForEndOfFrame frameEnd = new WaitForEndOfFrame();
-
         public IEnumerator SendCameraImage()
         {
             while (Enabled)
             {
                 yield return frameEnd;
 
-                if (!_StreamingEnabled) continue;
+                if (!StreamingEnabled) continue;
                 if (!Enabled) yield return null;
-              
-                Graphics.CopyTexture(this.TargetCamRenderTexture, this.texture2D);
 
-                AsyncGPUReadback.Request(this.texture2D, 0,
-                (request) =>
-                {
-                    Task.Run(() => texture2D.LoadRawTextureData(request.GetData<byte>()))
-                        .ContinueWith((previous) => jpgTexture = ImageConversion.EncodeToJPG(texture2D))
-                        .ContinueWith((previous) =>
-                        GrpcClient.SendCameraTextureAsync(new CameraData()
-                        {
-                            CameraId = _id.ToString(),
-                            CameraName = name,
-                            Speed = speedString,
-                            Altitude = altitudeString,
-                            Texture = jpgTexture
-                        }));
-                }
+                Graphics.CopyTexture(TargetCamRenderTexture, texture2D);
+
+                AsyncGPUReadback.Request(texture2D, 0,
+                    request =>
+                    {
+                        Task.Run(() => texture2D.LoadRawTextureData(request.GetData<byte>()))
+                            .ContinueWith(previous => jpgTexture = texture2D.EncodeToJPG())
+                            .ContinueWith(previous =>
+                                GrpcClient.SendCameraTextureAsync(new CameraData
+                                {
+                                    CameraId = Id.ToString(),
+                                    CameraName = Name,
+                                    Speed = SpeedString,
+                                    Altitude = AltitudeString,
+                                    Texture = jpgTexture
+                                }));
+                    }
                 );
-
             }
         }
 
@@ -147,18 +140,17 @@ namespace OfCourseIStillLoveYou
             partNearCamera.targetTexture = TargetCamRenderTexture;
             _cameras[0] = partNearCamera;
 
-            var a = Camera.current;
-
             //Scatterer shadow fix
-            var partialUnifiedCameraDepthBuffer = (PartialDepthBuffer) _cameras[0].gameObject.AddComponent(typeof(PartialDepthBuffer));
+            var partialUnifiedCameraDepthBuffer =
+                (PartialDepthBuffer) _cameras[0].gameObject.AddComponent(typeof(PartialDepthBuffer));
             partialUnifiedCameraDepthBuffer.Init(partNearCamera);
 
             //TUFX
-            PostProcessLayer layer = _cameras[0].gameObject.AddOrGetComponent<PostProcessLayer>();
+            var layer = _cameras[0].gameObject.AddOrGetComponent<PostProcessLayer>();
             layer.Init(TexturesUnlimitedFXLoader.Resources);
 
             layer.volumeLayer = ~0;
-            PostProcessVolume volume = _cameras[0].gameObject.AddOrGetComponent<PostProcessVolume>();
+            var volume = _cameras[0].gameObject.AddOrGetComponent<PostProcessVolume>();
             volume.isGlobal = true;
             volume.priority = 100;
 
@@ -214,10 +206,10 @@ namespace OfCourseIStillLoveYou
                 return;
             }
 
-            name = _hullcamera.vessel.GetDisplayName() + "." + _hullcamera.cameraName;
+            Name = _hullcamera.vessel.GetDisplayName() + "." + _hullcamera.cameraName;
 
-            _windowRect = GUI.Window(_id, _windowRect, WindowTargetCam,
-                name);
+            _windowRect = GUI.Window(Id, _windowRect, WindowTargetCam,
+                Name);
         }
 
         public void CheckIfResizing()
@@ -251,31 +243,32 @@ namespace OfCourseIStillLoveYou
             var imageRect = new Rect(2, 20, _adjCamImageSize, _adjCamImageSize);
 
 
-
             GUI.DrawTexture(imageRect, TargetCamRenderTexture, ScaleMode.StretchToFill, false);
 
             // Right side control buttons
             DrawSideControlButtons(imageRect);
 
 
-            GUIStyle dataStyle = new GUIStyle();
+            var dataStyle = new GUIStyle();
             dataStyle.alignment = TextAnchor.MiddleCenter;
             dataStyle.normal.textColor = Color.white;
             dataStyle.fontStyle = FontStyle.Bold;
             dataStyle.fontSize = 18;
 
             //target data
-            dataStyle.fontSize = (int)Mathf.Clamp(16 * TargetWindowScale, 9, 16);
+            dataStyle.fontSize = (int) Mathf.Clamp(16 * TargetWindowScale, 9, 16);
             //float dataStartX = stabilStartX + stabilizeRect.width + 8;
-            Rect targetRangeRect = new Rect(imageRect.x, (_adjCamImageSize * 0.94f) - (int)Mathf.Clamp(18 * TargetWindowScale, 9, 18), _adjCamImageSize, (int)Mathf.Clamp(18 * TargetWindowScale, 10, 18));
+            var targetRangeRect = new Rect(imageRect.x,
+                _adjCamImageSize * 0.94f - (int) Mathf.Clamp(18 * TargetWindowScale, 9, 18), _adjCamImageSize,
+                (int) Mathf.Clamp(18 * TargetWindowScale, 10, 18));
 
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine(this.altitudeString);
-            sb.AppendLine(this.speedString);
+            var sb = new StringBuilder();
+            sb.AppendLine(AltitudeString);
+            sb.AppendLine(SpeedString);
 
             GUI.Label(targetRangeRect, sb.ToString(), dataStyle);
 
-    
+
             //resizing
             var resizeRect =
                 new Rect(_windowWidth - 18, _windowHeight - 18, 16, 16);
@@ -300,41 +293,32 @@ namespace OfCourseIStillLoveYou
 
         private void DrawSideControlButtons(Rect imageRect)
         {
-            GUIStyle dataStyle = new GUIStyle();
-            dataStyle.alignment = TextAnchor.MiddleCenter;
-            dataStyle.normal.textColor = Color.white;
-            GUIStyle buttonStyle = new GUIStyle(HighLogic.Skin.button);
+            var buttonStyle = new GUIStyle(HighLogic.Skin.button);
             buttonStyle.fontSize = 10;
             buttonStyle.wordWrap = true;
 
-            float line = buttonHeight + gap;
-            float buttonWidth = 3 * buttonHeight + 4 * gap;
+            var line = buttonHeight + gap;
+            var buttonWidth = 3 * buttonHeight + 4 * gap;
             //groundStablize button
-            float startX = imageRect.width + 3 * gap;
-            Rect streamingRect = new Rect(startX, controlsStartY, buttonWidth, buttonHeight + line);
-            
-            if (!this._StreamingEnabled)
+            var startX = imageRect.width + 3 * gap;
+            var streamingRect = new Rect(startX, controlsStartY, buttonWidth, buttonHeight + line);
+
+            if (!StreamingEnabled)
             {
-                if (GUI.Button(streamingRect, "Enable streaming", buttonStyle))
-                {
-                    this._StreamingEnabled = true;
-                }
+                if (GUI.Button(streamingRect, "Enable streaming", buttonStyle)) StreamingEnabled = true;
             }
             else
             {
-                if (GUI.Button(streamingRect, "Disable streaming", buttonStyle))
-                {
-                    this._StreamingEnabled = false;
-                }
+                if (GUI.Button(streamingRect, "Disable streaming", buttonStyle)) StreamingEnabled = false;
             }
         }
 
         public void CalculateSpeedAltitude()
         {
-            float altitudeInKm = (float)Math.Round(this._hullcamera.vessel.altitude / 1000f, 1);
-            int speed = (int)Math.Round(this._hullcamera.vessel.speed * 3.6f, 0);
-            this.altitudeString = "ALTITUDE: " + altitudeInKm.ToString("0.0") + " KM";
-            this.speedString = "SPEED: " + speed + " KM/H";
+            var altitudeInKm = (float) Math.Round(_hullcamera.vessel.altitude / 1000f, 1);
+            var speed = (int) Math.Round(_hullcamera.vessel.speed * 3.6f, 0);
+            AltitudeString = "ALTITUDE: " + altitudeInKm.ToString("0.0") + " KM";
+            SpeedString = "SPEED: " + speed + " KM/H";
         }
 
         private void UpdateTargetScale(float diff)
@@ -381,15 +365,11 @@ namespace OfCourseIStillLoveYou
         public void Disable()
         {
             Enabled = false;
-            _StreamingEnabled = false;
-            
+            StreamingEnabled = false;
+
             foreach (var camera in _cameras)
-            {
                 if (camera != null)
-                {
                     camera.enabled = false;
-                }
-            }
         }
     }
 }

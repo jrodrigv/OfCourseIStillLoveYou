@@ -21,5 +21,9 @@
             return ((CameraData)obj).CameraId.Equals(CameraId);
         }
 
+        public override int GetHashCode()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

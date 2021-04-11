@@ -1,58 +1,56 @@
-﻿using Grpc.Core;
-using System;
-using OfCourseIStillLoveYou.Communication;
+﻿using System;
 using System.Threading.Tasks;
 using System.Timers;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
+using Grpc.Core;
+using OfCourseIStillLoveYou.Communication;
+using OfCourseIStillLoveYou.Server.Services;
 
 namespace OfCourseIStillLoveYou.Server
 {
-    class Program
+    internal class Program
     {
-        private static string ServerEndpoint = "localhost";
-        private static int Port = 50777;
-        const string ExitCommand = "exit";
+        private const string ExitCommand = "exit";
+        private static string _serverEndpoint = "localhost";
+        private static int _port = 50777;
 
-    
-        static void Main(string[] args)
+
+        private static void Main(string[] args)
         {
             UpdateConfiguration(args);
 
-            Timer InfoTimer = new Timer(30000);
-            InfoTimer.Elapsed += Timer_Elapsed;
+            var infoTimer = new Timer(30000);
+            infoTimer.Elapsed += Timer_Elapsed;
 
-            InfoTimer.Enabled = true;
-            InfoTimer.Start();
+            infoTimer.Enabled = true;
+            infoTimer.Start();
 
             var serverStub = new CameraStreamService();
 
             var server = new Grpc.Core.Server
             {
                 Services =
-            {
-                CameraStream.BindService(serverStub),
-            },
-                Ports = { new ServerPort(ServerEndpoint, Port, ServerCredentials.Insecure) }
+                {
+                    CameraStream.BindService(serverStub)
+                },
+                Ports = {new ServerPort(_serverEndpoint, _port, ServerCredentials.Insecure)}
             };
             server.Start();
 
 
-            Console.WriteLine($"OfCourseIStillLoveYou.Server is listening on {ServerEndpoint}:{Port}, waiting for incoming camera feed. Type exit for closing the server");
+            Console.WriteLine(
+                $"OfCourseIStillLoveYou.Server is listening on {_serverEndpoint}:{_port}, waiting for incoming camera feed. Type exit for closing the server");
 
             var keyStroke = string.Empty;
 
 
             while (keyStroke != ExitCommand)
             {
-                var random = new Random();
                 keyStroke = Console.ReadLine();
 
                 if (!string.IsNullOrWhiteSpace(keyStroke) && keyStroke != ExitCommand)
                 {
-
                 }
+
                 Task.Delay(100).Wait();
             }
 
@@ -64,17 +62,10 @@ namespace OfCourseIStillLoveYou.Server
         {
             try
             {
-                for (int i = 0; i < args.Length; i++)
-                {
+                for (var i = 0; i < args.Length; i++)
                     if (args[i].Equals("--port"))
-                    {
-                        Port = Int32.Parse(args[i + 1]);
-                    }
-                    else if (args[i].Equals("--endpoint"))
-                    {
-                        ServerEndpoint = args[i + 1];
-                    }
-                }
+                        _port = int.Parse(args[i + 1]);
+                    else if (args[i].Equals("--endpoint")) _serverEndpoint = args[i + 1];
             }
             catch (Exception)
             {
@@ -84,16 +75,12 @@ namespace OfCourseIStillLoveYou.Server
 
         private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            var numberOfCameras = CameraStreamService.cameraTextures.Count;
+            var numberOfCameras = CameraStreamService.CameraTextures.Count;
 
-            if(numberOfCameras > 0)
-            {
-                Console.WriteLine($"Receiving video signal from {numberOfCameras} cameras. At {CameraStreamService.GetAverageFrames()} FPS");
-            }
-            else
-            {
-                Console.WriteLine($"Waiting for camera signal");
-            }
+            Console.WriteLine(
+                numberOfCameras > 0
+                    ? $"Receiving video signal from {numberOfCameras} cameras. At {CameraStreamService.GetAverageFrames()} FPS"
+                    : "Waiting for camera signal");
         }
     }
 }

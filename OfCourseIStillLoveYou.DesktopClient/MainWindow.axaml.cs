@@ -1,50 +1,51 @@
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using Avalonia.Media;
-using Avalonia.Media.Imaging;
-using Avalonia.Threading;
-using OfCourseIStillLoveYou.Communication;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
+using Avalonia.Media.Imaging;
+using Avalonia.Threading;
+using Avalonia.Visuals.Media.Imaging;
+using OfCourseIStillLoveYou.Communication;
+
 namespace OfCourseIStillLoveYou.DesktopClient
 {
     public class MainWindow : Window
     {
-        const int delay = 33;
-        const string settingPath = "settings.json";
-        const string endpoint = "localhost";
-        const int port = 50777;
+        private const int Delay = 33;
+        private const string SettingPath = "settings.json";
+        private const string Endpoint = "localhost";
+        private const int Port = 50777;
+        private string? currentCamera;
 
-        private Bitmap initialImage;
-        private string currentCamera;
-        private Bitmap texture;
-       
-        private SettingsPOCO settings;
+        private Bitmap? initialImage;
 
-        public CameraData curretCameraData { get; private set; }
+        private SettingsPoco? settings;
 
-        private bool StatusUnstable = false;
+        private bool statusUnstable;
+        private Bitmap? texture;
 
         public MainWindow()
-       {
+        {
             InitializeComponent();
 #if DEBUG
             this.AttachDevTools();
-#endif        
+#endif
         }
+
+        public CameraData? CurretCameraData { get; private set; }
 
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
             StoreInitialImage();
             ReadSettings();
-            GrpcClient.ConnectToServer(settings.EndPoint, settings.Port);
+
+            if (settings != null) GrpcClient.ConnectToServer(settings.EndPoint, settings.Port);
+
             Task.Run(CameraFetchWorker);
             Task.Run(CameraTextureWorker);
         }
@@ -53,71 +54,69 @@ namespace OfCourseIStillLoveYou.DesktopClient
         {
             try
             {
-                var settingsText = File.ReadAllText(settingPath);
-                settings = JsonSerializer.Deserialize<SettingsPOCO>(settingsText);
+                var settingsText = File.ReadAllText(SettingPath);
+                settings = JsonSerializer.Deserialize<SettingsPoco>(settingsText);
             }
             catch (Exception)
             {
-                settings = new SettingsPOCO() { EndPoint = endpoint, Port = port };
+                settings = new SettingsPoco {EndPoint = Endpoint, Port = Port};
             }
         }
 
         private void StoreInitialImage()
         {
-            Dispatcher.UIThread.InvokeAsync(() => initialImage = (Bitmap)this.FindControl<Image>("imgCameraTexture").Source);
+            Dispatcher.UIThread.InvokeAsync(() =>
+                initialImage = (Bitmap) this.FindControl<Image>("imgCameraTexture").Source);
         }
 
         private void CameraTextureWorker()
         {
             while (true)
             {
-                Task.Delay(delay).Wait();
+                Task.Delay(Delay).Wait();
 
-                if (String.IsNullOrEmpty(currentCamera))
-                {
-                    continue;
-                }
-                
-                
-                Dispatcher.UIThread.InvokeAsync<double>(() =>
-                {
-                    return this.FindControl<Image>("imgCameraTexture").DesiredSize.Height;
-                }).ContinueWith((imageHeight) =>
-                {
-                    GrpcClient.GetCameraDataAsync(currentCamera).ContinueWith((camaraData) =>
+                if (string.IsNullOrEmpty(currentCamera)) continue;
+
+
+                Dispatcher.UIThread
+                    .InvokeAsync(() => { return this.FindControl<Image>("imgCameraTexture").DesiredSize.Height; })
+                    .ContinueWith(imageHeight =>
                     {
-                        if(camaraData.Result.Texture == null)
+                        GrpcClient.GetCameraDataAsync(currentCamera).ContinueWith(camaraData =>
                         {
-                            texture = initialImage;
-                        }
-                        else
-                        {
-                            using MemoryStream ms = new(camaraData.Result.Texture);
-                            texture = Bitmap.DecodeToHeight(ms, (int)imageHeight.Result, Avalonia.Visuals.Media.Imaging.BitmapInterpolationMode.MediumQuality);
-                        }
-                        this.curretCameraData = camaraData.Result;
+                            if (camaraData.Result.Texture == null)
+                            {
+                                texture = initialImage;
+                            }
+                            else
+                            {
+                                using MemoryStream ms = new(camaraData.Result.Texture);
+                                texture = Bitmap.DecodeToHeight(ms, (int) imageHeight.Result,
+                                    BitmapInterpolationMode.MediumQuality);
+                            }
 
-                    }).ContinueWith((newTexture) => 
-                    Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        this.FindControl<Image>("imgCameraTexture").Source = texture;
-                        
-                        if(curretCameraData.Texture == null)
-                        {
-                            StatusUnstable = true;
-                        }
-                        else
-                        {
-                            StatusUnstable = false;
+                            CurretCameraData = camaraData.Result;
+                        }).ContinueWith(_ =>
+                            Dispatcher.UIThread.InvokeAsync(() =>
+                            {
+                                this.FindControl<Image>("imgCameraTexture").Source = texture;
 
-                            TextBlock textInfo = this.FindControl<TextBlock>("TextInfo");
-                            StringBuilder sb = new StringBuilder();
-                            sb.AppendLine(curretCameraData.Altitude);
-                            sb.AppendLine(curretCameraData.Speed);
-                            textInfo.Text = sb.ToString();
-                        }
-                    }));
-                });  
+                                if (CurretCameraData?.Texture == null)
+                                {
+                                    statusUnstable = true;
+                                }
+                                else
+                                {
+                                    statusUnstable = false;
+
+                                    TextBlock textInfo = this.FindControl<TextBlock>("TextInfo");
+                                    StringBuilder sb = new();
+                                    sb.AppendLine(CurretCameraData.Altitude);
+                                    sb.AppendLine(CurretCameraData.Speed);
+                                    textInfo.Text = sb.ToString();
+                                }
+                            }));
+                    });
             }
         }
 
@@ -130,32 +129,36 @@ namespace OfCourseIStillLoveYou.DesktopClient
                 {
                     var cameraIds = GrpcClient.GetCameraIds();
 
-                    if (StatusUnstable)
+                    if (statusUnstable)
                     {
                         Dispatcher.UIThread.InvokeAsync(() => NotifyUnstableCameraFeed());
                         continue;
                     }
-                    if(cameraIds == null || cameraIds.Count == 0)
+
+                    if (cameraIds == null || cameraIds.Count == 0)
                     {
                         Dispatcher.UIThread.InvokeAsync(() => NotifyWaitingForCameraFeed());
                         continue;
                     }
 
-                    Dispatcher.UIThread.InvokeAsync<string>(() => GetSelectedCamera()).ContinueWith((selectedCamera) => { currentCamera = selectedCamera.Result; });
+                    Dispatcher.UIThread.InvokeAsync(GetSelectedCamera).ContinueWith(selectedCamera =>
+                    {
+                        currentCamera = selectedCamera.Result;
+                    });
 
                     Dispatcher.UIThread.InvokeAsync(() => UpdateCameraList(cameraIds));
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     Dispatcher.UIThread.InvokeAsync(() => NotifyConnectingToServer());
                 }
             }
         }
 
-        private string GetSelectedCamera()
+        private string? GetSelectedCamera()
         {
             var cbCameras = this.FindControl<ComboBox>("cbCameras");
-            return cbCameras.SelectedItem == null? String.Empty:cbCameras.SelectedItem?.ToString();
+            return cbCameras.SelectedItem == null ? string.Empty : cbCameras.SelectedItem.ToString();
         }
 
         private void NotifyWaitingForCameraFeed()
@@ -179,13 +182,7 @@ namespace OfCourseIStillLoveYou.DesktopClient
         private void UpdateCameraList(List<string> cameraIds)
         {
             var cbCameras = this.FindControl<ComboBox>("cbCameras");
-            cbCameras.Items = cameraIds;    
+            cbCameras.Items = cameraIds;
         }
-    }
-
-    public class SettingsPOCO
-    {
-        public string EndPoint { get; set; }
-        public int Port { get; set; }
     }
 }

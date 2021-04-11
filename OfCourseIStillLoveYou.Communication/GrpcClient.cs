@@ -1,8 +1,8 @@
-﻿using Grpc.Core;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Google.Protobuf;
+using Grpc.Core;
 
 namespace OfCourseIStillLoveYou.Communication
 {
@@ -20,55 +20,44 @@ namespace OfCourseIStillLoveYou.Communication
 
         public static void SendCameraTexture(int id, byte[] texture)
         {
-            Client.SendCameraStream(new SendCameraStreamRequest()
-            { CameraId = id.ToString(), Texture = Google.Protobuf.ByteString.CopyFrom(texture) });
+            Client.SendCameraStream(new SendCameraStreamRequest
+                {CameraId = id.ToString(), Texture = ByteString.CopyFrom(texture)});
         }
 
         public static List<string> GetCameraIds()
         {
-            List<string> cameraIds = new List<string>();
-
             var cameraIdsProto = Client.GetActiveCameraIds(new GetActiveCameraIdsRequest());
 
-            cameraIds = cameraIdsProto.Cameras.ToList<string>();
-           
+            var cameraIds = cameraIdsProto.Cameras.ToList();
+
             return cameraIds;
         }
 
         public static Task<CameraData> GetCameraDataAsync(string cameraId)
         {
-            var cameraTextureProto = Client.GetCameraTextureAsync(new GetCameraTextureRequest() { CameraId = cameraId });
-    
-            return cameraTextureProto.ResponseAsync.ContinueWith((previous) =>
+            var cameraTextureProto = Client.GetCameraTextureAsync(new GetCameraTextureRequest {CameraId = cameraId});
+
+            return cameraTextureProto.ResponseAsync.ContinueWith(previous =>
             {
                 if (previous.Result.Texture.Length == 0)
-                {
-                    return new CameraData()
+                    return new CameraData
                     {
                         Texture = null
                     };
-                }
 
-                byte[] cameraTexture = new byte[previous.Result.Texture.Length];
+                var cameraTexture = new byte[previous.Result.Texture.Length];
 
                 previous.Result.Texture.CopyTo(cameraTexture, 0);
 
-                return new CameraData()
+                return new CameraData
                 {
                     CameraId = previous.Result.CameraId,
                     CameraName = previous.Result.CameraName,
                     Altitude = previous.Result.Altitude,
                     Speed = previous.Result.Speed,
-                    Texture = cameraTexture,
+                    Texture = cameraTexture
                 };
             });
-        }
-
-        public static Task<int>  GetCurrentFPSAsync()
-        {
-            var result = Client.GetAverageFpsAsync(new GetAverageFpsRequest());
-
-            return result.ResponseAsync.ContinueWith((previous) => previous.Result.AverageFps);
         }
     }
 }

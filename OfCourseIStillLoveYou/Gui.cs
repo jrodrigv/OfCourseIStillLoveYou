@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using HullcamVDS;
 using KSP.UI.Screens;
 using UnityEngine;
@@ -9,7 +8,6 @@ namespace OfCourseIStillLoveYou
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class Gui : MonoBehaviour
     {
-
         private const float WindowWidth = 250;
         private const float DraggableHeight = 40;
         private const float LeftIndent = 12;
@@ -23,8 +21,8 @@ namespace OfCourseIStillLoveYou
         private float _windowHeight = 250;
         private Rect _windowRect;
 
-        
-        private void Awake()
+
+        void Awake()
         {
             if (Fetch)
                 Destroy(Fetch);
@@ -32,30 +30,26 @@ namespace OfCourseIStillLoveYou
             Fetch = this;
         }
 
-        private void Start()
+        void Start()
         {
             _windowRect = new Rect(Screen.width - WindowWidth - 40, 100, WindowWidth, _windowHeight);
             AddToolbarButton();
             GameEvents.onHideUI.Add(GameUiDisable);
             GameEvents.onShowUI.Add(GameUiEnable);
             _gameUiToggle = true;
-
         }
 
-        // ReSharper disable once InconsistentNaming
-        private void OnGUI()
+        void OnGUI()
         {
             if (GuiEnabled && _gameUiToggle)
             {
                 _windowRect = GUI.Window(1850, _windowRect, GuiWindow, "");
-                UpdateAllCameras();   
+                UpdateAllCameras();
             }
-            
         }
 
         void LateUpdate()
         {
-
             RemoveDisabledCameras();
         }
 
@@ -64,30 +58,24 @@ namespace OfCourseIStillLoveYou
             var camerasToDelete = new List<int>();
 
             foreach (var trackingCamera in Core.TrackedCameras)
-            {
-                if(CameraHasToBeDeleted(trackingCamera.Value))
+                if (CameraHasToBeDeleted(trackingCamera.Value))
                 {
                     trackingCamera.Value.Disable();
                     camerasToDelete.Add(trackingCamera.Value.Id);
                 }
-            }
 
-            foreach (var cameraId in camerasToDelete)
-            {
-                Core.TrackedCameras.Remove(cameraId);
-            }
-
+            foreach (var cameraId in camerasToDelete) Core.TrackedCameras.Remove(cameraId);
         }
 
         private bool CameraHasToBeDeleted(TrackingCamera trackingCamera)
         {
-            return (!trackingCamera.Enabled ||  trackingCamera.Vessel == null || !trackingCamera.Vessel.loaded);
+            return !trackingCamera.Enabled || trackingCamera.Vessel == null || !trackingCamera.Vessel.loaded;
         }
 
         private void GuiWindow(int windowId)
         {
             GUI.DragWindow(new Rect(0, 0, WindowWidth, DraggableHeight));
-            int line = 0;
+            var line = 0;
 
             DrawTitle();
             line++;
@@ -97,11 +85,9 @@ namespace OfCourseIStillLoveYou
                 line++;
 
                 if (!Core.TrackedCameras.ContainsKey(muMechModuleHullCamera.GetInstanceID()))
-                {
                     DrawCameraButton(muMechModuleHullCamera, line);
-                }
-               
             }
+
             line++;
 
             _windowHeight = ContentTop + line * entryHeight + entryHeight + entryHeight;
@@ -111,15 +97,11 @@ namespace OfCourseIStillLoveYou
         private void UpdateAllCameras()
         {
             foreach (var trackingCamera in Core.TrackedCameras)
-            {
-
                 if (trackingCamera.Value.Enabled)
                 {
-
                     trackingCamera.Value.CheckIfResizing();
                     trackingCamera.Value.CreateGui();
                 }
-            }
         }
 
         private string GetCameraName(MuMechModuleHullCamera muMechModuleHullCamera)
@@ -127,13 +109,13 @@ namespace OfCourseIStillLoveYou
             return muMechModuleHullCamera.vessel.GetDisplayName() + "." + muMechModuleHullCamera.cameraName;
         }
 
- 
+
         private void DrawTitle()
         {
             var centerLabel = new GUIStyle
             {
                 alignment = TextAnchor.UpperCenter,
-                normal = { textColor = Color.white }
+                normal = {textColor = Color.white}
             };
             var titleStyle = new GUIStyle(centerLabel)
             {
@@ -146,19 +128,14 @@ namespace OfCourseIStillLoveYou
         private void DrawCameraButton(MuMechModuleHullCamera camera, int line)
         {
             var saveRect = new Rect(LeftIndent, ContentTop + line * entryHeight, contentWidth, entryHeight);
-            
 
-            if (GUI.Button(saveRect, GetCameraName(camera)))
-            {
-                OpenCameraInstance( camera);
-            }
-              
+
+            if (GUI.Button(saveRect, GetCameraName(camera))) OpenCameraInstance(camera);
         }
 
         public void OpenCameraInstance(MuMechModuleHullCamera camera)
         {
             if (GuiEnabled && _gameUiToggle)
-            {
                 if (!Core.TrackedCameras.ContainsKey(camera.GetInstanceID()))
                 {
                     var newCamera = new TrackingCamera(camera.GetInstanceID(), camera);
@@ -167,8 +144,6 @@ namespace OfCourseIStillLoveYou
 
                     Core.TrackedCameras.Add(camera.GetInstanceID(), newCamera);
                 }
-            }
-               
         }
 
         private void AddToolbarButton()
@@ -207,7 +182,5 @@ namespace OfCourseIStillLoveYou
         {
             _gameUiToggle = false;
         }
-
-        
     }
 }
