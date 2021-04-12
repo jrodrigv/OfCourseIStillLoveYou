@@ -11,7 +11,7 @@ namespace OfCourseIStillLoveYou.Server
     {
         private const string ExitCommand = "exit";
         private static string _serverEndpoint = "localhost";
-        private static int _port = 50777;
+        private static int _port = 5077;
 
 
         private static void Main(string[] args)

@@ -18,7 +18,7 @@ namespace OfCourseIStillLoveYou.DesktopClient
         private const int Delay = 33;
         private const string SettingPath = "settings.json";
         private const string Endpoint = "localhost";
-        private const int Port = 50777;
+        private const int Port = 5077;
         private string? currentCamera;
 
         private Bitmap? initialImage;
