@@ -11,9 +11,10 @@ pool:
 
 steps:
 - task: PowerShell@2
+  displayName: Downloading build dependencies
   inputs:
     targetType: 'inline'
     script: |
       # Write your PowerShell commands here.
-      curl https://1drv.ms/u/s!AixZLrjtqp-RgtFTPl8fy0KWwFSNmA?e=l4NFor -o Dependencies.zip
+      curl https://defaultstoragewesteur114.blob.core.windows.net/ksp/Dependencies.zip -o Dependencies.zip
 
