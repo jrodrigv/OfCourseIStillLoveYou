@@ -15,7 +15,7 @@ namespace OfCourseIStillLoveYou.DesktopClient
 {
     public class MainWindow : Window
     {
-        private const int Delay = 33;
+        private const int Delay = 17;
         private const string SettingPath = "settings.json";
         private const string Endpoint = "localhost";
         private const int Port = 5077;
@@ -79,7 +79,7 @@ namespace OfCourseIStillLoveYou.DesktopClient
 
 
                 Dispatcher.UIThread
-                    .InvokeAsync(() => { return this.FindControl<Image>("imgCameraTexture").DesiredSize.Height; })
+                    .InvokeAsync(() => this.FindControl<Image>("imgCameraTexture").DesiredSize.Height)
                     .ContinueWith(imageHeight =>
                     {
                         GrpcClient.GetCameraDataAsync(currentCamera).ContinueWith(camaraData =>
@@ -131,26 +131,27 @@ namespace OfCourseIStillLoveYou.DesktopClient
 
                     if (statusUnstable)
                     {
-                        Dispatcher.UIThread.InvokeAsync(() => NotifyUnstableCameraFeed());
-                        continue;
+                        Dispatcher.UIThread.InvokeAsync(NotifyUnstableCameraFeed);
                     }
-
-                    if (cameraIds == null || cameraIds.Count == 0)
+                    else if ((cameraIds == null || cameraIds.Count == 0))
                     {
-                        Dispatcher.UIThread.InvokeAsync(() => NotifyWaitingForCameraFeed());
-                        continue;
+                        Dispatcher.UIThread.InvokeAsync(NotifyWaitingForCameraFeed);
                     }
+                    
+                    Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        if (cameraIds != null) UpdateCameraList(cameraIds);
+                    });
 
                     Dispatcher.UIThread.InvokeAsync(GetSelectedCamera).ContinueWith(selectedCamera =>
                     {
                         currentCamera = selectedCamera.Result;
                     });
 
-                    Dispatcher.UIThread.InvokeAsync(() => UpdateCameraList(cameraIds));
                 }
                 catch (Exception)
                 {
-                    Dispatcher.UIThread.InvokeAsync(() => NotifyConnectingToServer());
+                    Dispatcher.UIThread.InvokeAsync(NotifyConnectingToServer);
                 }
             }
         }
@@ -179,10 +180,16 @@ namespace OfCourseIStillLoveYou.DesktopClient
             textInfo.Text = "Connecting to server...";
         }
 
-        private void UpdateCameraList(List<string> cameraIds)
+        private void UpdateCameraList(List<string?> cameraIds)
         {
             var cbCameras = this.FindControl<ComboBox>("cbCameras");
             cbCameras.Items = cameraIds;
+
+            if (cbCameras.SelectedItem != null && !cameraIds.Contains(cbCameras.SelectedItem.ToString()))
+            {
+                cbCameras.SelectedItem = "";
+            }
+
         }
     }
 }
