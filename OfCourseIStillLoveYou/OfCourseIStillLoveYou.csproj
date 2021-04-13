@@ -33,88 +33,84 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\_LocalDev\KSPRefs\Assembly-CSharp.dll</HintPath>
+      <HintPath>Dependencies\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="HullCamera">
-      <HintPath>D:\GAMES\KERBAL\Kerbal Space Program_1112_dev\GameData\HullCameraVDS\Plugins\HullCamera.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>Dependencies\HullCamera.dll</HintPath>
     </Reference>
     <Reference Include="KSPAssets">
-      <HintPath>..\..\_LocalDev\KSPRefs\KSPAssets.dll</HintPath>
+      <HintPath>Dependencies\KSPAssets.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="scatterer, Version=0.723.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\GAMES\KERBAL\Kerbal Space Program_1112_dev\GameData\scatterer\scatterer.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="scatterer">
+      <HintPath>Dependencies\scatterer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="TUFX">
-      <HintPath>D:\GAMES\KERBAL\Kerbal Space Program_1112_dev\GameData\TUFX\Plugins\TUFX.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>Dependencies\TUFX.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.dll</HintPath>
+      <HintPath>Dependencies\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.AnimationModule.dll</HintPath>
+      <HintPath>Dependencies\UnityEngine.AnimationModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.AssetBundleModule.dll</HintPath>
+      <HintPath>Dependencies\UnityEngine.AssetBundleModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>Dependencies\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.ImageConversionModule.dll</HintPath>
+      <HintPath>Dependencies\UnityEngine.ImageConversionModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>Dependencies\UnityEngine.IMGUIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>Dependencies\UnityEngine.InputLegacyModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.InputModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.InputModule.dll</HintPath>
+      <HintPath>Dependencies\UnityEngine.InputModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>Dependencies\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TextCoreModule">
-      <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.TextCoreModule.dll</HintPath>
+      <HintPath>Dependencies\UnityEngine.TextCoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>Dependencies\UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.UI.dll</HintPath>
+      <HintPath>Dependencies\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UIElementsModule">
-      <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.UIElementsModule.dll</HintPath>
+      <HintPath>Dependencies\UnityEngine.UIElementsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UIModule">
-      <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.UIModule.dll</HintPath>
+      <HintPath>Dependencies\UnityEngine.UIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestWWWModule">
-      <HintPath>..\..\_LocalDev\KSPRefs\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+      <HintPath>Dependencies\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -135,7 +131,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>@echo $(Targetname)
+    <PostBuildEvent>if $(ConfigurationName) == Debug (
+
+@echo $(Targetname)
 SET ModName=OfCourseIStillLoveYou
 
 rem this step strips the solutionName from the git path to give us the root folder for locating the LocalDev Folder
@@ -171,13 +169,18 @@ call "%25ZA_DIR%25\7za.exe" a -tzip -r  "%25DIST_DIR%25\%25ModName%25.@(VersionN
 xcopy /E /Y "$(ProjectDir)Distribution\GameData" "%25KSP_DIR%25\GameData"
 
 
-@echo Build/deploy complete!</PostBuildEvent>
+@echo Build/deploy complete!
+
+)</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>SET ModName=OfCourseIStillLoveYou
+    <PreBuildEvent>if $(ConfigurationName) == Debug (
+
+SET ModName=OfCourseIStillLoveYou
 RD /S /Q $(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\
 MD $(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\
 
-xcopy /E /Y "$(ProjectDir)"Dependencies\grpc_csharp_ext.dll "$(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\"</PreBuildEvent>
+xcopy /E /Y "$(ProjectDir)"Dependencies\win\grpc_csharp_ext.dll "$(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\"
+)</PreBuildEvent>
   </PropertyGroup>
 </Project>
