@@ -19,8 +19,14 @@ steps:
   displayName: Extracting dependencies
   inputs:
     archiveFilePatterns: '**/Dependencies.zip'
-    destinationFolder: '$(Build.SourcesDirectory)/OfCourseIStillLoveYou/Dependencies'
+    destinationFolder: '$(Build.SourcesDirectory)/OfCourseIStillLoveYou'
     cleanDestinationFolder: true
     overwriteExistingFiles: false
 
-
+- task: DotNetCoreCLI@2
+  displayName: Publishing win-x64
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: './OfCourseIStillLoveYou/OfCourseIStillLoveYou.csproj'
+    arguments: '--configuration Release --runtime win-x64 --output $(Build.BinariesDirectory)/win-x64 -p:PreBuildEvent=;PostBuildEvent='
