@@ -38,6 +38,7 @@
     </Reference>
     <Reference Include="HullCamera">
       <HintPath>Dependencies\HullCamera.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="KSPAssets">
       <HintPath>Dependencies\KSPAssets.dll</HintPath>
@@ -45,11 +46,13 @@
     </Reference>
     <Reference Include="scatterer">
       <HintPath>Dependencies\scatterer.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="TUFX">
       <HintPath>Dependencies\TUFX.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>Dependencies\UnityEngine.dll</HintPath>
@@ -131,7 +134,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug (
+    <PostBuildEvent>
 
 @echo $(Targetname)
 SET ModName=OfCourseIStillLoveYou
@@ -154,11 +157,6 @@ set /p DIST_DIR=&lt;"%25GIT_PATH%25_LocalDev\dist_dir.txt"
 if not exist "$(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\" mkdir "$(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\"
 xcopy /E /Y "$(TargetDir)"OfCourseIStillLoveYou*.dll "$(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\"
 
-if $(ConfigurationName) == Debug (
-@echo building debug files and symbols...
-copy /Y "$(TargetDir)"OfCourseIStillLoveYou*.pdb "%25KSP_DIR%25\GameData\%25ModName%25\Plugins\"
-)
-
 @echo deleting previous build ...
 if exist "%25DIST_DIR%25\%25ModName%25.*.zip" del "%25DIST_DIR%25\%25ModName%25.*.zip"
 @echo packaging new build...
@@ -170,17 +168,16 @@ xcopy /E /Y "$(ProjectDir)Distribution\GameData" "%25KSP_DIR%25\GameData"
 
 
 @echo Build/deploy complete!
-
-)</PostBuildEvent>
+</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>if $(ConfigurationName) == Debug (
+    <PreBuildEvent>
 
 SET ModName=OfCourseIStillLoveYou
 RD /S /Q $(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\
 MD $(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\
 
 xcopy /E /Y "$(ProjectDir)"Dependencies\win\grpc_csharp_ext.dll "$(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\"
-)</PreBuildEvent>
+</PreBuildEvent>
   </PropertyGroup>
 </Project>

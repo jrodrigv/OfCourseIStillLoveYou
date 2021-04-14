@@ -33,7 +33,7 @@ namespace OfCourseIStillLoveYou
 			depthCamera.enabled = false;
 			depthCamera.clearFlags = CameraClearFlags.Depth;
 
-			depthTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.Depth); //we could almost get away with 16bit but it gets weird sometimes
+			depthTexture = new RenderTexture(768, 768, 24, RenderTextureFormat.Depth); //we could almost get away with 16bit but it gets weird sometimes
 			depthTexture.useMipMap = false;
 			depthTexture.antiAliasing = 1; //no AA needed
 			depthTexture.filterMode = FilterMode.Point;
