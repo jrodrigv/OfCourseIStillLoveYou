@@ -20,7 +20,7 @@ steps:
   inputs:
     archiveFilePatterns: '**/Dependencies.zip'
     destinationFolder: '$(Build.SourcesDirectory)/OfCourseIStillLoveYou'
-    cleanDestinationFolder: true
+    cleanDestinationFolder: false
     overwriteExistingFiles: false
 
 - task: DotNetCoreCLI@2
@@ -30,4 +30,3 @@ steps:
     publishWebProjects: false
     projects: '**/OfCourseIStillLoveYou.csproj'
     arguments: '--configuration Release --runtime win-x64 --output $(Build.BinariesDirectory)/win-x64 -p:PreBuildEvent=;PostBuildEvent='
-    workingDirectory: $(Build.SourcesDirectory)
