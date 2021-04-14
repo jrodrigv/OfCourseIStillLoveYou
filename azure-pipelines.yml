@@ -3,8 +3,6 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-- main
 
 pool:
   vmImage: ubuntu-latest
@@ -17,4 +15,12 @@ steps:
     script: |
       # Write your PowerShell commands here.
       curl https://defaultstoragewesteur114.blob.core.windows.net/ksp/Dependencies.zip -o Dependencies.zip
+- task: ExtractFiles@1
+  displayName: Extracting dependencies
+  inputs:
+    archiveFilePatterns: '**/Dependencies.zip'
+    destinationFolder: '$(Build.SourcesDirectory)/OfCourseIStillLoveYou/Dependencies'
+    cleanDestinationFolder: true
+    overwriteExistingFiles: false
+
 
