@@ -29,4 +29,4 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: '**/OfCourseIStillLoveYou.csproj'
-    arguments: '--configuration Release --runtime win-x64 --output $(Build.BinariesDirectory)/win-x64 -p:PreBuildEvent=;PostBuildEvent='
+    arguments: '--configuration Release --runtime win-x64 --output $(Build.ArtifactStagingDirectory)/OfCourseIStillLoveYou_winX64_v1.0 -p:PreBuildEvent=;PostBuildEvent='
