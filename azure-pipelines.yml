@@ -23,16 +23,13 @@ steps:
     cleanDestinationFolder: false
     overwriteExistingFiles: false
 
-- task: PowerShell@2
-  displayName: Downloading build dependencies
+- task: Bash@3
   inputs:
     targetType: 'inline'
     script: |
-      # Write your PowerShell commands here.
-      New-Item -ItemType "win-x64" -Path $(Build.ArtifactStagingDirectory)
-      New-Item -ItemType "osx-x64" -Path $(Build.ArtifactStagingDirectory)
-      New-Item -ItemType "linux-x64" -Path $(Build.ArtifactStagingDirectory)
-
+      # Write your commands here
+      mkdir -p $(Build.ArtifactStagingDirectory)/win-x64
+      
 - task: DotNetCoreCLI@2
   displayName: Publishing win-x64
   inputs:
