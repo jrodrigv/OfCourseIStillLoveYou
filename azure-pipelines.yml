@@ -5,7 +5,7 @@
 
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: windows-latest
 
 steps:
 - task: PowerShell@2
@@ -18,8 +18,8 @@ steps:
 - task: ExtractFiles@1
   displayName: Extracting dependencies
   inputs:
-    archiveFilePatterns: '**/Dependencies.zip'
-    destinationFolder: '$(Build.SourcesDirectory)/OfCourseIStillLoveYou'
+    archiveFilePatterns: '**\Dependencies.zip'
+    destinationFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou'
     cleanDestinationFolder: false
     overwriteExistingFiles: false
 
@@ -29,11 +29,57 @@ steps:
     script: |
       # Write your commands here
       mkdir -p $(Build.ArtifactStagingDirectory)/win-x64
-      
+
+- task: PowerShell@2
+  displayName: Creating artifacts folder
+  inputs:
+    targetType: 'inline'
+    script: |
+     New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/win
+     New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/linux
+     New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/osx
 - task: DotNetCoreCLI@2
-  displayName: Publishing win-x64
+  displayName: Publishing Desktop win-x64
   inputs:
     command: 'publish'
     publishWebProjects: false
     projects: '**/OfCourseIStillLoveYou.DesktopClient.csproj'
-    arguments: '--configuration Release --runtime win-x64 --output $(Build.ArtifactStagingDirectory)/win-x64'
+    arguments: '--configuration Release --runtime win-x64 --output $(Build.ArtifactStagingDirectory)/win'
+
+- task: DotNetCoreCLI@2
+  displayName: Publishing Server win-x64
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '**/OfCourseIStillLoveYou.Server.csproj'
+    arguments: '--configuration Release --runtime win-x64 --output $(Build.ArtifactStagingDirectory)/win'
+    
+- task: DotNetCoreCLI@2
+  displayName: Compiling mod
+  inputs:
+    command: 'build'
+    projects: '**/OfCourseIStillLoveYou.csproj'
+    arguments: '-p:PreBuildEvent=;PostBuildEvent= --configuration Release --runtime win-x64'
+  
+- task: CopyFiles@2
+  displayName: Copy grpc native depedency for Windows
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Dependencies\win'
+    Contents: '**'
+    TargetFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Distribution\GameData\OfCourseIStillLoveYou\Plugins'
+    
+- task: ArchiveFiles@2
+  displayName: Zipping OfCourseIStillLoveYou for Windows
+  inputs:
+    rootFolderOrFile: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Distribution\GameData'
+    includeRootFolder: true
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/win/OfCourseIStillLoveYou_v1.$(Build.BuildId).zip'
+    replaceExistingArchive: true
+- task: PublishBuildArtifacts@1
+  displayName: Publishing Windows Artifacts
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/win'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+    
