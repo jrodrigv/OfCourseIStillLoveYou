@@ -23,13 +23,6 @@ steps:
     cleanDestinationFolder: false
     overwriteExistingFiles: false
 
-- task: Bash@3
-  inputs:
-    targetType: 'inline'
-    script: |
-      # Write your commands here
-      mkdir -p $(Build.ArtifactStagingDirectory)/win-x64
-
 - task: PowerShell@2
   displayName: Creating artifacts folder
   inputs:
@@ -54,6 +47,14 @@ steps:
     projects: '**/OfCourseIStillLoveYou.Server.csproj'
     arguments: '--configuration Release --runtime win-x64 --output $(Build.ArtifactStagingDirectory)/win'
     
+
+- task: DotNetCoreCLI@2
+  displayName: Restoring mod packages
+  inputs:
+    command: 'restore'
+    projects: '**/OfCourseIStillLoveYou.csproj'
+    feedsToUse: 'select'
+  
 - task: DotNetCoreCLI@2
   displayName: Compiling mod
   inputs:
