@@ -31,37 +31,28 @@ steps:
      New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/win
      New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/linux
      New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/osx
-- task: DotNetCoreCLI@2
-  displayName: Publishing Desktop win-x64
+- task: NuGetToolInstaller@1
   inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: '**/OfCourseIStillLoveYou.DesktopClient.csproj'
-    arguments: '--configuration Release --runtime win-x64 --output $(Build.ArtifactStagingDirectory)/win'
+    versionSpec:
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: '**/*.sln'
+    feedsToUse: 'select'
+- task: VSBuild@1
+  inputs:
+    solution: '**\*.sln'
+    msbuildArgs: '-p:PreBuildEvent=;PostBuildEvent='
+    platform: 'Any Cpu'
+    configuration: 'Release'
+    msbuildArchitecture: 'x64'
 
-- task: DotNetCoreCLI@2
-  displayName: Publishing Server win-x64
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: '**/OfCourseIStillLoveYou.Server.csproj'
-    arguments: '--configuration Release --runtime win-x64 --output $(Build.ArtifactStagingDirectory)/win'
-    
-    
-- task: DotNetCoreCLI@2
-  displayName: Compiling mod
-  inputs:
-    command: 'build'
-    projects: '**/OfCourseIStillLoveYou.csproj'
-    arguments: '-p:PreBuildEvent=;PostBuildEvent= --configuration Release --runtime win-x64'
-  
 - task: CopyFiles@2
   displayName: Copy grpc native depedency for Windows
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Dependencies\win'
     Contents: '**'
     TargetFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Distribution\GameData\OfCourseIStillLoveYou\Plugins'
-    
 - task: ArchiveFiles@2
   displayName: Zipping OfCourseIStillLoveYou for Windows
   inputs:
@@ -76,4 +67,27 @@ steps:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)/win'
     ArtifactName: 'drop'
     publishLocation: 'Container'
+
+
+# - task: DotNetCoreCLI@2
+#   displayName: Publishing Desktop win-x64
+#   inputs:
+#     command: 'publish'
+#     publishWebProjects: false
+#     projects: '**/OfCourseIStillLoveYou.DesktopClient.csproj'
+#     arguments: '--configuration Release --runtime win-x64 --output $(Build.ArtifactStagingDirectory)/win'
+
+# - task: DotNetCoreCLI@2
+#   displayName: Publishing Server win-x64
+#   inputs:
+#     command: 'publish'
+#     publishWebProjects: false
+#     projects: '**/OfCourseIStillLoveYou.Server.csproj'
+#     arguments: '--configuration Release --runtime win-x64 --output $(Build.ArtifactStagingDirectory)/win'
+    
+    
+
+
+    
+
     
