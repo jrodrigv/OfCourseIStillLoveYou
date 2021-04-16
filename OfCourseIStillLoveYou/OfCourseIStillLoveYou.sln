@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OfCourseIStillLoveYou.Clien
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OfCourseIStillLoveYou.Communication", "..\OfCourseIStillLoveYou.Communication\OfCourseIStillLoveYou.Communication.csproj", "{137469E0-5FFC-4AA7-BCCF-888AF067147E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OfCourseIStillLoveYou.DesktopClient", "..\OfCourseIStillLoveYou.DesktopClient\OfCourseIStillLoveYou.DesktopClient.csproj", "{53CDA966-3E9A-4B0B-A778-853F79787164}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OfCourseIStillLoveYou.DesktopClient", "..\OfCourseIStillLoveYou.DesktopClient\OfCourseIStillLoveYou.DesktopClient.csproj", "{53CDA966-3E9A-4B0B-A778-853F79787164}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
