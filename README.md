@@ -9,7 +9,9 @@ KSP mod to display hullcam cameras views on different GUI inside or outside the 
 * Latest HullcamVDS https://github.com/linuxgurugamer/HullcamVDSContinued/releases
 
 * Latest Scatterer https://github.com/LGhassen/Scatterer/releases
-* TUFX JR edition https://github.com/jrodrigv/TUFX/releases
+* If you want to use TUFX you need to use this version -> TUFX JR edition https://github.com/jrodrigv/TUFX/releases
+
+
 
 ## Mod Only Installation:
 * Download the zip file for Windows, Linux or Mac.
