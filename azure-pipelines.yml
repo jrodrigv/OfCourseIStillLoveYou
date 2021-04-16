@@ -167,8 +167,8 @@ steps:
     repositoryName: 'jrodrigv/OfCourseIStillLoveYou'
     action: 'create'
     target: '$(Build.SourceVersion)'
-    tagSource: 'gitTag'
-    tagPattern: 'v1.0.$(Build.BuildId)'
+    tagSource: 'userSpecifiedTag'
+    tag: 'v1.0.$(Build.BuildId)'
     assets: |
       (Build.ArtifactStagingDirectory)/OfCourseIStillLoveYou_win_v1.0.$(Build.BuildId).zip
       (Build.ArtifactStagingDirectory)/OfCourseIStillLoveYou_linux_v1.0.$(Build.BuildId).zip
