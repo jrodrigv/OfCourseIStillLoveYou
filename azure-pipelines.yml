@@ -109,7 +109,7 @@ steps:
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Distribution\'
     Contents: '**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)\win-x64'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\linux-x64'
 
 - task: CopyFiles@2
   displayName: Copy mod binaries to osx artifact directory
