@@ -5,11 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using HullcamVDS;
 using OfCourseIStillLoveYou.Client;
-using TUFX;
-using TUFX.PostProcessing;
+using OfCourseIStillLoveYou.TUFX;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.PostProcessing;
 
 namespace OfCourseIStillLoveYou
 {
@@ -146,15 +144,9 @@ namespace OfCourseIStillLoveYou
             partialUnifiedCameraDepthBuffer.Init(partNearCamera);
 
             //TUFX
-            var layer = _cameras[0].gameObject.AddOrGetComponent<PostProcessLayer>();
-            layer.Init(TexturesUnlimitedFXLoader.Resources);
+            AddTufxPostProcessing();
 
-            layer.volumeLayer = ~0;
-            var volume = _cameras[0].gameObject.AddOrGetComponent<PostProcessVolume>();
-            volume.isGlobal = true;
-            volume.priority = 100;
-
-            var cam2Obj = new GameObject();
+             var cam2Obj = new GameObject();
             var partScaledCamera = cam2Obj.AddComponent<Camera>();
             var mainSkyCam = FindCamera("Camera ScaledSpace");
 
@@ -193,6 +185,18 @@ namespace OfCourseIStillLoveYou
             camRotatorgalaxy.NearCamera = partNearCamera;
 
             for (var i = 0; i < _cameras.Length; i++) _cameras[i].enabled = false;
+        }
+
+        private void AddTufxPostProcessing()
+        {
+            try
+            {
+                TUFXWrapper.AddPostProcessing(_cameras[0]);
+            }
+            catch
+            {
+                // ignored
+            }
         }
 
 

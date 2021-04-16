@@ -51,10 +51,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
-    <Reference Include="TUFX">
-      <HintPath>Dependencies\TUFX.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>Dependencies\UnityEngine.dll</HintPath>
       <Private>False</Private>
@@ -130,6 +126,10 @@
     <ProjectReference Include="..\OfCourseIStillLoveYou.Client\OfCourseIStillLoveYou.Client.csproj">
       <Project>{ffa6d494-83d7-4a7f-9a01-7fba88c65cbc}</Project>
       <Name>OfCourseIStillLoveYou.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OfCourseIStillLoveYou.TUFX\OfCourseIStillLoveYou.TUFX.csproj">
+      <Project>{D77C6684-5D8A-4E3C-BFE0-C2B8F54DBAAB}</Project>
+      <Name>OfCourseIStillLoveYou.TUFX</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

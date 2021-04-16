@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OfCourseIStillLoveYou.Commu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OfCourseIStillLoveYou.DesktopClient", "..\OfCourseIStillLoveYou.DesktopClient\OfCourseIStillLoveYou.DesktopClient.csproj", "{53CDA966-3E9A-4B0B-A778-853F79787164}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OfCourseIStillLoveYou.TUFX", "..\OfCourseIStillLoveYou.TUFX\OfCourseIStillLoveYou.TUFX.csproj", "{D77C6684-5D8A-4E3C-BFE0-C2B8F54DBAAB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{53CDA966-3E9A-4B0B-A778-853F79787164}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53CDA966-3E9A-4B0B-A778-853F79787164}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53CDA966-3E9A-4B0B-A778-853F79787164}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D77C6684-5D8A-4E3C-BFE0-C2B8F54DBAAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D77C6684-5D8A-4E3C-BFE0-C2B8F54DBAAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D77C6684-5D8A-4E3C-BFE0-C2B8F54DBAAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D77C6684-5D8A-4E3C-BFE0-C2B8F54DBAAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
