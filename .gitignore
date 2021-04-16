@@ -348,8 +348,6 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-/OfCourseIStillLoveYou/Distribution/GameData/OfCourseIStillLoveYou/Plugins/TUFX.dll
-/OfCourseIStillLoveYou/Distribution/GameData/OfCourseIStillLoveYou/Plugins/scatterer.dll
-/OfCourseIStillLoveYou/Distribution/GameData/OfCourseIStillLoveYou/Plugins/HullCamera.dll
+/OfCourseIStillLoveYou/Distribution/GameData/OfCourseIStillLoveYou/Plugins/
 /OfCourseIStillLoveYou/Dependencies/
 /OfCourseIStillLoveYou/Dependencies.zip
