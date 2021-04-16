@@ -48,12 +48,6 @@ steps:
     arguments: '--configuration Release --runtime win-x64 --output $(Build.ArtifactStagingDirectory)/win'
     
     
-- task: NuGetCommand@2
-  inputs:
-    command: 'restore'
-    restoreSolution: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\OfCourseIStillLoveYou.Client\packages.config'
-    feedsToUse: 'select'
-
 - task: DotNetCoreCLI@2
   displayName: Compiling mod
   inputs:
