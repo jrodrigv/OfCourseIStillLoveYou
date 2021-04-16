@@ -31,6 +31,56 @@ steps:
      New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/win-x64
      New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/linux-x64
      New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/osx-x64
+
+- task: DotNetCoreCLI@2
+  displayName: Publishing Desktop win-x64
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '**/OfCourseIStillLoveYou.DesktopClient.csproj'
+    arguments: '-p:Version=1.0.$(Build.BuildId) --configuration Release --runtime win-x64 --output $(Build.ArtifactStagingDirectory)\win-x64\desktopclient'
+
+- task: DotNetCoreCLI@2
+  displayName: Publishing Server win-x64
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '**/OfCourseIStillLoveYou.Server.csproj'
+    arguments: '-p:Version=1.0.$(Build.BuildId) --configuration Release --runtime win-x64 --output $(Build.ArtifactStagingDirectory)\win-x64\server'
+
+- task: DotNetCoreCLI@2
+  displayName: Publishing Desktop linux-x64
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '**/OfCourseIStillLoveYou.DesktopClient.csproj'
+    arguments: '-p:Version=1.0.$(Build.BuildId) --configuration Release --runtime linux-x64 --output $(Build.ArtifactStagingDirectory)\linux-x64\desktopclient'
+
+- task: DotNetCoreCLI@2
+  displayName: Publishing Server linux-x64
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '**/OfCourseIStillLoveYou.Server.csproj'
+    arguments: '-p:Version=1.0.$(Build.BuildId) --configuration Release --runtime linux-x64 --output $(Build.ArtifactStagingDirectory)\linux-x64\server'
+
+- task: DotNetCoreCLI@2
+  displayName: Publishing Desktop osx-x64
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '**/OfCourseIStillLoveYou.DesktopClient.csproj'
+    arguments: '-p:Version=1.0.$(Build.BuildId) --configuration Release --runtime osx-x64 --output $(Build.ArtifactStagingDirectory)\osx-x64\desktopclient'
+
+- task: DotNetCoreCLI@2
+  displayName: Publishing Server osx-x64
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '**/OfCourseIStillLoveYou.Server.csproj'
+    arguments: '-p:Version=1.0.$(Build.BuildId) --configuration Release --runtime osx-x64 --output $(Build.ArtifactStagingDirectory)\osx-x64\server'
+
+
 - task: NuGetToolInstaller@1
   inputs:
     versionSpec:
@@ -88,53 +138,6 @@ steps:
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\osx-x64\modbinaries\GameData\OfCourseIStillLoveYou\Plugins'
     
-- task: DotNetCoreCLI@2
-  displayName: Publishing Desktop win-x64
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: '**/OfCourseIStillLoveYou.DesktopClient.csproj'
-    arguments: '--no-restore --configuration Release --runtime win-x64 --output $(Build.ArtifactStagingDirectory)\win-x64\desktopclient'
-
-- task: DotNetCoreCLI@2
-  displayName: Publishing Server win-x64
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: '**/OfCourseIStillLoveYou.Server.csproj'
-    arguments: '--no-restore --configuration Release --runtime win-x64 --output $(Build.ArtifactStagingDirectory)\win-x64\server'
-
-- task: DotNetCoreCLI@2
-  displayName: Publishing Desktop linux-x64
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: '**/OfCourseIStillLoveYou.DesktopClient.csproj'
-    arguments: '--no-restore --configuration Release --runtime linux-x64 --output $(Build.ArtifactStagingDirectory)\linux-x64\desktopclient'
-
-- task: DotNetCoreCLI@2
-  displayName: Publishing Server linux-x64
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: '**/OfCourseIStillLoveYou.Server.csproj'
-    arguments: '--no-restore --configuration Release --runtime linux-x64 --output $(Build.ArtifactStagingDirectory)\linux-x64\server'
-
-- task: DotNetCoreCLI@2
-  displayName: Publishing Desktop osx-x64
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: '**/OfCourseIStillLoveYou.DesktopClient.csproj'
-    arguments: '--no-restore --configuration Release --runtime osx-x64 --output $(Build.ArtifactStagingDirectory)\osx-x64\desktopclient'
-
-- task: DotNetCoreCLI@2
-  displayName: Publishing Server osx-x64
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: '**/OfCourseIStillLoveYou.Server.csproj'
-    arguments: '--no-restore --configuration Release --runtime osx-x64 --output $(Build.ArtifactStagingDirectory)\osx-x64\server'
 
 
 - task: PublishBuildArtifacts@1
