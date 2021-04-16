@@ -74,5 +74,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\OfCourseIStillLoveYou\packages\Grpc.Tools.2.24.0\build\Grpc.Tools.props')" Text="$([System.String]::Format('$(ErrorText)', '..\OfCourseIStillLoveYou\packages\Grpc.Tools.2.24.0\build\Grpc.Tools.props'))" />
+    <Error Condition="!Exists('..\OfCourseIStillLoveYou\packages\Grpc.Tools.2.24.0\build\Grpc.Tools.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\OfCourseIStillLoveYou\packages\Grpc.Tools.2.24.0\build\Grpc.Tools.targets'))" />
+  </Target>
   <Import Project="..\OfCourseIStillLoveYou\packages\Grpc.Tools.2.24.0\build\Grpc.Tools.targets" Condition="Exists('..\OfCourseIStillLoveYou\packages\Grpc.Tools.2.24.0\build\Grpc.Tools.targets')" />
 </Project>
