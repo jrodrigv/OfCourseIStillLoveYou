@@ -173,7 +173,7 @@ steps:
       (Build.ArtifactStagingDirectory)/OfCourseIStillLoveYou_win_v1.0.$(Build.BuildId).zip
       (Build.ArtifactStagingDirectory)/OfCourseIStillLoveYou_linux_v1.0.$(Build.BuildId).zip
       (Build.ArtifactStagingDirectory)/OfCourseIStillLoveYou_osx_v1.0.$(Build.BuildId).zip
-    title: 'OfCourseIStillLoveYou'
+    title: 'OfCourseIStillLoveYou v1.0.$(Build.BuildId)'
     releaseNotesFilePath: '$(Build.SourcesDirectory)\ReleaseNotes.md'
     isDraft: true
     addChangeLog: false
