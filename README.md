@@ -28,6 +28,10 @@ KSP mod to display hullcam cameras views on different GUI inside or outside the 
   * Mod: Inside the mod folder there is a settings.cfg file with the endpoint and port.
 * Execute the OfCourseIStillLoveYou.Server.exe first, then OfCourseIStillLoveYou.DesktopClient.exe and finally start KSP
 
+## Running the server as a Docker Container
+* Pull de image *docker pull jrodrigv/ofcourseistillloveyou:server_v1.0*
+* Create a new container - example overriding endpoint to listen everything and from port 5000: *docker run -d -p 192.168.0.14:5000:5000 ofcourseistillloveyou.server:v1.0 --port 5000 --endpoint 0.0.0.0*
+
 ## Mod usage
 
-Take a look to this video tutorial :)
+Take a look to this video tutorial :) (TBD)
