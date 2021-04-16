@@ -139,32 +139,41 @@ steps:
     TargetFolder: '$(Build.ArtifactStagingDirectory)\osx-x64\GameData\OfCourseIStillLoveYou\Plugins'
     
 
-
-- task: PublishBuildArtifacts@1
-  displayName: Publishing Windows Artifacts
+- task: ArchiveFiles@2
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/win-x64'
-    ArtifactName: 'OfCourseIStillLoveYou_win_v1.0.$(Build.BuildId)'
-    publishLocation: 'Container'
-
-- task: PublishBuildArtifacts@1
-  displayName: Publishing Linux Artifacts
+    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/win-x64'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '(Build.ArtifactStagingDirectory)/OfCourseIStillLoveYou_win_v1.0.$(Build.BuildId).zip'
+    replaceExistingArchive: true
+    
+- task: ArchiveFiles@2
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/linux-x64'
-    ArtifactName: 'OfCourseIStillLoveYou_linux_v1.0.$(Build.BuildId)'
-    publishLocation: 'Container'
-
-- task: PublishBuildArtifacts@1
-  displayName: Publishing osx Artifacts
+    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/linux-x64'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '(Build.ArtifactStagingDirectory)/OfCourseIStillLoveYou_linux_v1.0.$(Build.BuildId).zip'
+    replaceExistingArchive: true
+- task: ArchiveFiles@2
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/osx-x64'
-    ArtifactName: 'OfCourseIStillLoveYou_osx_v1.0.$(Build.BuildId)'
-    publishLocation: 'Container'
-
-    
-    
-
-
-    
-
-    
+    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/osx-x64'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '(Build.ArtifactStagingDirectory)/OfCourseIStillLoveYou_osx_v1.0.$(Build.BuildId).zip'
+    replaceExistingArchive: true
+- task: GitHubRelease@1
+  inputs:
+    gitHubConnection: 'JRV'
+    repositoryName: 'jrodrigv/OfCourseIStillLoveYou'
+    action: 'create'
+    target: '$(Build.SourceVersion)'
+    tagSource: 'gitTag'
+    tagPattern: 'v1.0.$(Build.BuildId)'
+    assets: |
+      (Build.ArtifactStagingDirectory)/OfCourseIStillLoveYou_win_v1.0.$(Build.BuildId).zip
+      (Build.ArtifactStagingDirectory)/OfCourseIStillLoveYou_linux_v1.0.$(Build.BuildId).zip
+      (Build.ArtifactStagingDirectory)/OfCourseIStillLoveYou_osx_v1.0.$(Build.BuildId).zip
+    title: 'OfCourseIStillLoveYou'
+    releaseNotesFilePath: '$(Build.SourcesDirectory)\ReleaseNotes.md'
+    isDraft: true
+    addChangeLog: false
