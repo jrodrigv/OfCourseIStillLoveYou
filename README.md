@@ -1,3 +1,5 @@
+[![Build Status](https://dev.azure.com/jrodrigv/Personal/_apis/build/status/jrodrigv.OfCourseIStillLoveYou?branchName=main)](https://dev.azure.com/jrodrigv/Personal/_build/latest?definitionId=6&branchName=main)
+
 # OfCourseIStillLoveYou
 
 KSP mod to display hullcam cameras views on different GUI inside or outside the game using a Desktop app and Server app.
