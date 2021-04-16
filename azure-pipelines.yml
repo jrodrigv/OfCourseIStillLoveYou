@@ -31,6 +31,14 @@ steps:
      New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/win
      New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/linux
      New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/osx
+- task: NuGetToolInstaller@1
+  inputs:
+    versionSpec:
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: '**/*.sln'
+    feedsToUse: 'select'
 - task: VSBuild@1
   inputs:
     solution: '**\*.sln'
