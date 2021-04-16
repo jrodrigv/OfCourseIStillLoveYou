@@ -163,8 +163,8 @@ steps:
     replaceExistingArchive: true
 - task: GitHubRelease@1
   inputs:
-    gitHubConnection: 'jrodrigv'
-    repositoryName: 'OfCourseIStillLoveYou'
+    gitHubConnection: 'JRV'
+    repositoryName: 'jrodrigv/OfCourseIStillLoveYou'
     action: 'create'
     target: '$(Build.SourceVersion)'
     tagSource: 'gitTag'
