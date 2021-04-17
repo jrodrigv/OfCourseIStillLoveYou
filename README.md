@@ -37,4 +37,6 @@ KSP mod to display hullcam cameras views on different GUI inside or outside the 
 
 ## Mod usage
 
-Take a look to this video tutorial :) (TBD)
+Take a look to this video tutorial :)
+
+https://youtu.be/OV0Z4xpFYlA
