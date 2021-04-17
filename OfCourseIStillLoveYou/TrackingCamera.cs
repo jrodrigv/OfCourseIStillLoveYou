@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HullcamVDS;
 using OfCourseIStillLoveYou.Client;
+using OfCourseIStillLoveYou.Scatterer;
 using OfCourseIStillLoveYou.TUFX;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -139,10 +140,8 @@ namespace OfCourseIStillLoveYou
             _cameras[0] = partNearCamera;
 
             //Scatterer shadow fix
-            var partialUnifiedCameraDepthBuffer =
-                (PartialDepthBuffer) _cameras[0].gameObject.AddComponent(typeof(PartialDepthBuffer));
-            partialUnifiedCameraDepthBuffer.Init(partNearCamera);
-
+            AddScattererShadowFix();
+            
             //TUFX
             AddTufxPostProcessing();
 
@@ -185,6 +184,18 @@ namespace OfCourseIStillLoveYou
             camRotatorgalaxy.NearCamera = partNearCamera;
 
             for (var i = 0; i < _cameras.Length; i++) _cameras[i].enabled = false;
+        }
+
+        private void AddScattererShadowFix()
+        {
+            try
+            {
+                ScattererWrapper.AddShadowFixToCamera(_cameras[0]);
+            }
+            catch
+            {
+                // ignored
+            }
         }
 
         private void AddTufxPostProcessing()

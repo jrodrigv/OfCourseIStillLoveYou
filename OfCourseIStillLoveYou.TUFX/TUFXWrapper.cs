@@ -9,7 +9,7 @@ namespace OfCourseIStillLoveYou.TUFX
     {
         public static void AddPostProcessing (Camera c)
         {
-            //TUFX
+           
             var layer = c.gameObject.AddOrGetComponent<PostProcessLayer>();
             layer.Init(TexturesUnlimitedFXLoader.Resources);
 
