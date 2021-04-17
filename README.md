@@ -1,22 +1,23 @@
 <p align="center">
     <a href="https://paypal.me/jrodrigv"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat&logo=paypal" alt="PayPal"/></a>
     <a href="https://dev.azure.com/jrodrigv/Personal/_build/latest?definitionId=6&branchName=main"><img src="https://dev.azure.com/jrodrigv/Personal/_apis/build/status/jrodrigv.OfCourseIStillLoveYou?branchName=main" alt="Azure Devops"/></a>
+    <a href="../../releases"><img src="https://img.shields.io/github/release/jrodrigv/OfCourseIStillLoveYou.svg?style=flat&logo=github&logoColor=white" alt="Latest release" /></a>
+     <a href="../../releases"><img src="https://img.shields.io/github/downloads/jrodrigv/OfCourseIStillLoveYou/total.svg?style=flat&logo=github&logoColor=white" alt="Total downloads" />
 </p>
 
 # OfCourseIStillLoveYou
 
 KSP mod to display hullcam cameras views on different GUI inside or outside the game using a Desktop app and Server app.
 
-
 ## Requirements:
 * KSP 1.11.2
 * NET 5 runtime https://dotnet.microsoft.com/download/dotnet/5.0
 * Latest HullcamVDS https://github.com/linuxgurugamer/HullcamVDSContinued/releases
 
+## Highly recommended mods:
+* Physics Range Extender
 * Latest Scatterer https://github.com/LGhassen/Scatterer/releases
-* If you want to use TUFX you need to use this version -> TUFX JR edition https://github.com/jrodrigv/TUFX/releases
-
-
+* If you want to use TUFX you need to use this version -> TUFX JR edition https://github.com/jrodrigv/TUFX/releases 
 
 ## Mod Only Installation:
 * Download the zip file for Windows, Linux or Mac.
@@ -32,7 +33,7 @@ KSP mod to display hullcam cameras views on different GUI inside or outside the 
 
 ## Running the server as a Docker Container
 * Pull the image *docker pull jrodrigv/ofcourseistillloveyou:server_v1.0*
-* Create a new container - example overriding endpoint to listen everything and from port 5000: *docker run -d -p 192.168.0.14:5000:5000 ofcourseistillloveyou.server:v1.0 --port 5000 --endpoint 0.0.0.0*
+* Create a new container - example overriding endpoint to listen everything and from port 5000: *docker run -d -p 192.168.0.14:5000:5000 ofcourseistillloveyou:server_v1.0 --port 5000 --endpoint 0.0.0.0*
 
 ## Mod usage
 
