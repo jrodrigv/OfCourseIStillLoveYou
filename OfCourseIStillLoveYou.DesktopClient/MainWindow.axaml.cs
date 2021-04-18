@@ -4,7 +4,9 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
@@ -190,6 +192,21 @@ namespace OfCourseIStillLoveYou.DesktopClient
                 cbCameras.SelectedItem = "";
             }
 
+        }
+
+        private void ImgCameraTexture_OnDoubleTapped(object? sender, RoutedEventArgs e)
+        {
+
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                var textInfo = this.FindControl<TextBlock>("TextInfo");
+                var cbCameras = this.FindControl<ComboBox>("cbCameras");
+                var labelCameras = this.FindControl<Label>("labelCameras");
+
+                labelCameras.IsVisible = !labelCameras.IsVisible;
+                textInfo.IsVisible = !textInfo.IsVisible;
+                cbCameras.IsVisible = !cbCameras.IsVisible;
+            });
         }
     }
 }

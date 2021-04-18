@@ -7,10 +7,10 @@
         Title="OfCourseIStillLoveYou.DesktopClient">
 
   
-  <Panel Background="Black">
-    <Image Name="imgCameraTexture" Stretch="Uniform" Source="/Assets/OfCourseIStillLoveYou.png" ClipToBounds="true" ></Image>
+  <Panel Background="Black" >
+    <Image Name="imgCameraTexture" Stretch="Uniform" Source="/Assets/OfCourseIStillLoveYou.png" ClipToBounds="true"  DoubleTapped="ImgCameraTexture_OnDoubleTapped"></Image>
     <DockPanel  Margin="10" ClipToBounds="True" >
-      <Label Content="SELECT A CAMERA" Foreground="White" FontSize="14" FontFamily="Calibri" FontWeight="400"></Label>
+      <Label Name="labelCameras" Content="SELECT A CAMERA" Foreground="White" FontSize="14" FontFamily="Calibri" FontWeight="400"></Label>
       <ComboBox Name="cbCameras" Margin="5,0,0,0" MinWidth="150"></ComboBox>
     </DockPanel>
 
