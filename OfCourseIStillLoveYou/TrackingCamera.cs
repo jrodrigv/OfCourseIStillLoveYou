@@ -381,6 +381,7 @@ namespace OfCourseIStillLoveYou
         {
             Enabled = false;
             StreamingEnabled = false;
+            this.TargetCamRenderTexture.Release();
 
             foreach (var camera in _cameras)
                 if (camera != null)
