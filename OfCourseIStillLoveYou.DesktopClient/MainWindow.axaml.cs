@@ -116,6 +116,9 @@ namespace OfCourseIStillLoveYou.DesktopClient
                                     sb.AppendLine(CurretCameraData.Altitude);
                                     sb.AppendLine(CurretCameraData.Speed);
                                     textInfo.Text = sb.ToString();
+
+                                    Window window = this.FindControl<Window>("MainWindow");
+                                    window.Title = CurretCameraData.CameraName;
                                 }
                             }));
                     });
