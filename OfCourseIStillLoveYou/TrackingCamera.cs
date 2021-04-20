@@ -99,6 +99,8 @@ namespace OfCourseIStillLoveYou
                 if (!StreamingEnabled) continue;
                 if (!Enabled) yield return null;
 
+                if(render) continue;
+
                 Graphics.CopyTexture(TargetCamRenderTexture, texture2D);
 
                 AsyncGPUReadback.Request(texture2D, 0,
@@ -137,6 +139,7 @@ namespace OfCourseIStillLoveYou
             partNearCamera.transform.localPosition = _hullcamera.cameraPosition;
             partNearCamera.fieldOfView = _hullcamera.cameraFoV;
             partNearCamera.targetTexture = TargetCamRenderTexture;
+
             _cameras[0] = partNearCamera;
 
             //Scatterer shadow fix
@@ -367,8 +370,13 @@ namespace OfCourseIStillLoveYou
                 windowPosition.y = Screen.height - windowPosition.height;
         }
 
+        private bool render = true;
         public void RenderCameras()
         {
+            render = !render;
+
+            if (!render) return;
+
             for (var i = _cameras.Length - 1; i >= 0; i--)
             {
                 if (_cameras[i] == null) return;
