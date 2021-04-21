@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
@@ -205,11 +206,38 @@ namespace OfCourseIStillLoveYou.DesktopClient
                 var textInfo = this.FindControl<TextBlock>("TextInfo");
                 var cbCameras = this.FindControl<ComboBox>("cbCameras");
                 var labelCameras = this.FindControl<Label>("labelCameras");
+                var imgResize = this.FindControl<Image>("imgResize");
+                var imgClose = this.FindControl<Image>("imgClose");
 
                 labelCameras.IsVisible = !labelCameras.IsVisible;
                 textInfo.IsVisible = !textInfo.IsVisible;
                 cbCameras.IsVisible = !cbCameras.IsVisible;
+                imgResize.IsVisible = !imgResize.IsVisible;
+                imgClose.IsVisible = !imgClose.IsVisible;
+
             });
+        }
+
+        private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            {
+                this.BeginMoveDrag(e);
+                
+            }
+        }
+
+        private void ImgResize_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            {
+                this.BeginResizeDrag(WindowEdge.SouthEast, e);
+            }
+        }
+
+        private void ImgClose_OnTapped(object? sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }
