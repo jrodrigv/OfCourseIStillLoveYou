@@ -36,6 +36,7 @@ namespace OfCourseIStillLoveYou
         private float _windowWidth;
 
         private readonly WaitForEndOfFrame frameEnd = new WaitForEndOfFrame();
+        private readonly WaitForSeconds fixedDelay = new WaitForSeconds(0.030f);
         private byte[] jpgTexture;
         public RenderTexture TargetCamRenderTexture;
         private readonly Texture2D texture2D = new Texture2D(768, 768, TextureFormat.ARGB32, false);
@@ -94,10 +95,15 @@ namespace OfCourseIStillLoveYou
         {
             while (Enabled)
             {
+                yield return fixedDelay;
+
+                if (!Enabled) yield return null;
+
+                RenderCameras();
+
                 yield return frameEnd;
 
                 if (!StreamingEnabled) continue;
-                if (!Enabled) yield return null;
 
                 Graphics.CopyTexture(TargetCamRenderTexture, texture2D);
 
@@ -135,7 +141,7 @@ namespace OfCourseIStillLoveYou
             partNearCamera.transform.localRotation =
                 Quaternion.LookRotation(_hullcamera.cameraForward, _hullcamera.cameraUp);
             partNearCamera.transform.localPosition = _hullcamera.cameraPosition;
-            partNearCamera.fieldOfView = _hullcamera.cameraFoV;
+            partNearCamera.fieldOfView = 50;
             partNearCamera.targetTexture = TargetCamRenderTexture;
             _cameras[0] = partNearCamera;
 
@@ -157,6 +163,7 @@ namespace OfCourseIStillLoveYou
             partScaledCamera.transform.localRotation = Quaternion.identity;
             partScaledCamera.transform.localPosition = Vector3.zero;
             partScaledCamera.transform.localScale = Vector3.one;
+            partScaledCamera.fieldOfView = 50;
             partScaledCamera.targetTexture = TargetCamRenderTexture;
             _cameras[1] = partScaledCamera;
 
@@ -176,7 +183,7 @@ namespace OfCourseIStillLoveYou
             galaxyCam.transform.position = Vector3.zero;
             galaxyCam.transform.localRotation = Quaternion.identity;
             galaxyCam.transform.localScale = Vector3.one;
-            galaxyCam.fieldOfView = 60;
+            galaxyCam.fieldOfView = 50;
             galaxyCam.targetTexture = TargetCamRenderTexture;
             _cameras[2] = galaxyCam;
 
@@ -367,7 +374,7 @@ namespace OfCourseIStillLoveYou
                 windowPosition.y = Screen.height - windowPosition.height;
         }
 
-        public void RenderCameras()
+        private void RenderCameras()
         {
             for (var i = _cameras.Length - 1; i >= 0; i--)
             {

@@ -17,7 +17,7 @@ namespace OfCourseIStillLoveYou.DesktopClient
 {
     public class MainWindow : Window
     {
-        private const int Delay = 20;
+        private const int Delay = 30;
         private const string SettingPath = "settings.json";
         private const string Endpoint = "localhost";
         private const int Port = 5077;

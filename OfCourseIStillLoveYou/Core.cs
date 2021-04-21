@@ -43,17 +43,16 @@ namespace OfCourseIStillLoveYou
 
         void LateUpdate()
         {
-            RenderCameras();
+            UpdateTelemetry();
         }
 
 
-        private void RenderCameras()
+        private void UpdateTelemetry()
         {
             foreach (var trackedCamerasValue in TrackedCameras.Values)
             {
                 if (trackedCamerasValue.Enabled)
                 {
-                    trackedCamerasValue.RenderCameras();
                     trackedCamerasValue.CalculateSpeedAltitude();
                 }
             }
