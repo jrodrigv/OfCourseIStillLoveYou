@@ -1,4 +1,2 @@
-Performance improvements:
-*  Locking to 25 fps max the cameras rendering and streaming to improve KSP FPS.
-*  Reducing camera FOV from 60 to 50. A bit more of zoom to render less and improve performance.
-*  Reducing desktop client refresh rate to avoid unnecesary CPU load.
+* Desktop client: Now it is borderless! All the controls can be hidden by double-click on the camera image
+* Documentation updated with Desktop client usage.
