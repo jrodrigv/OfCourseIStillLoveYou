@@ -15,8 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OfCourseIStillLoveYou.Deskt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OfCourseIStillLoveYou.TUFX", "..\OfCourseIStillLoveYou.TUFX\OfCourseIStillLoveYou.TUFX.csproj", "{D77C6684-5D8A-4E3C-BFE0-C2B8F54DBAAB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OfCourseIStillLoveYou.Scatterer", "..\OfCourseIStillLoveYou.Scatterer\OfCourseIStillLoveYou.Scatterer.csproj", "{F7A0242A-AF99-44D8-9FA4-E2554FDBEAE1}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,10 +45,6 @@ Global
 		{D77C6684-5D8A-4E3C-BFE0-C2B8F54DBAAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D77C6684-5D8A-4E3C-BFE0-C2B8F54DBAAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D77C6684-5D8A-4E3C-BFE0-C2B8F54DBAAB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F7A0242A-AF99-44D8-9FA4-E2554FDBEAE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F7A0242A-AF99-44D8-9FA4-E2554FDBEAE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F7A0242A-AF99-44D8-9FA4-E2554FDBEAE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F7A0242A-AF99-44D8-9FA4-E2554FDBEAE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

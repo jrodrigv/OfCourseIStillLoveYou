@@ -12,9 +12,9 @@ namespace OfCourseIStillLoveYou.Scatterer
     {
         public static void AddShadowFixToCamera(Camera c)
         {
-            var partialUnifiedCameraDepthBuffer =
-                (PartialDepthBuffer) c.gameObject.AddComponent(typeof(PartialDepthBuffer));
-            partialUnifiedCameraDepthBuffer.Init(c);
+            //var partialUnifiedCameraDepthBuffer =
+            //    (PartialDepthBuffer)c.gameObject.AddComponent(typeof(PartialDepthBuffer));
+            //partialUnifiedCameraDepthBuffer.Init(c);
         }
     }
 }

@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using HullcamVDS;
 using OfCourseIStillLoveYou.Client;
-using OfCourseIStillLoveYou.Scatterer;
 using OfCourseIStillLoveYou.TUFX;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -145,8 +144,6 @@ namespace OfCourseIStillLoveYou
             partNearCamera.targetTexture = TargetCamRenderTexture;
             _cameras[0] = partNearCamera;
 
-            //Scatterer shadow fix
-            AddScattererShadowFix();
             
             //TUFX
             AddTufxPostProcessing();
@@ -193,17 +190,6 @@ namespace OfCourseIStillLoveYou
             for (var i = 0; i < _cameras.Length; i++) _cameras[i].enabled = false;
         }
 
-        private void AddScattererShadowFix()
-        {
-            try
-            {
-                ScattererWrapper.AddShadowFixToCamera(_cameras[0]);
-            }
-            catch
-            {
-                // ignored
-            }
-        }
 
         private void AddTufxPostProcessing()
         {
