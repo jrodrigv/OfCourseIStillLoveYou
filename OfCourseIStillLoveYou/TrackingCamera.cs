@@ -16,8 +16,12 @@ namespace OfCourseIStillLoveYou
         private static readonly float buttonHeight = 18;
         private static readonly float gap = 2;
         private static readonly float controlsStartY = 22;
+        private static readonly Font TelemetryFont = Font.CreateDynamicFontFromOSFont("Bahnschrift Semibold", 17);
 
-        //private Camera partRealCamera;
+        private static readonly GUIStyle TelemetryGuiStyle = new GUIStyle()
+            {alignment = TextAnchor.MiddleCenter, normal = new GUIStyleState() {textColor = Color.white}, fontStyle = FontStyle.Bold, font = TelemetryFont };
+    
+
 
 
         public static Texture2D ResizeTexture =
@@ -39,6 +43,8 @@ namespace OfCourseIStillLoveYou
         private byte[] jpgTexture;
         public RenderTexture TargetCamRenderTexture;
         private readonly Texture2D texture2D = new Texture2D(768, 768, TextureFormat.ARGB32, false);
+
+        
 
         public TrackingCamera(int id, MuMechModuleHullCamera hullcamera)
         {
@@ -238,7 +244,7 @@ namespace OfCourseIStillLoveYou
 
 
             WindowIsOpen = true;
-
+            
             GUI.DragWindow(new Rect(0, 0, _windowHeight - 18, 30));
             if (GUI.Button(new Rect(_windowWidth - 18, 2, 20, 16), "X", GUI.skin.button))
             {
@@ -248,33 +254,12 @@ namespace OfCourseIStillLoveYou
                 return;
             }
 
-            var imageRect = new Rect(2, 20, _adjCamImageSize, _adjCamImageSize);
-
-
-            GUI.DrawTexture(imageRect, TargetCamRenderTexture, ScaleMode.StretchToFill, false);
+            var imageRect = DrawTexture();
 
             // Right side control buttons
             DrawSideControlButtons(imageRect);
 
-
-            var dataStyle = new GUIStyle();
-            dataStyle.alignment = TextAnchor.MiddleCenter;
-            dataStyle.normal.textColor = Color.white;
-            dataStyle.fontStyle = FontStyle.Bold;
-            dataStyle.fontSize = 18;
-
-            //target data
-            dataStyle.fontSize = (int) Mathf.Clamp(16 * TargetWindowScale, 9, 16);
-            //float dataStartX = stabilStartX + stabilizeRect.width + 8;
-            var targetRangeRect = new Rect(imageRect.x,
-                _adjCamImageSize * 0.94f - (int) Mathf.Clamp(18 * TargetWindowScale, 9, 18), _adjCamImageSize,
-                (int) Mathf.Clamp(18 * TargetWindowScale, 10, 18));
-
-            var sb = new StringBuilder();
-            sb.AppendLine(AltitudeString);
-            sb.AppendLine(SpeedString);
-
-            GUI.Label(targetRangeRect, sb.ToString(), dataStyle);
+            DrawTelemetry(imageRect);
 
 
             //resizing
@@ -283,6 +268,12 @@ namespace OfCourseIStillLoveYou
 
 
             GUI.DrawTexture(resizeRect, ResizeTexture, ScaleMode.StretchToFill, true);
+
+            if (Event.current.type == EventType.MouseDown && Event.current.clickCount == 2 && imageRect.Contains(Event.current.mousePosition))
+            {
+                MinimalUI = !MinimalUI;
+                ResizeTargetWindow();
+            }
 
             if (Event.current.type == EventType.MouseDown && resizeRect.Contains(Event.current.mousePosition))
                 ResizingWindow = true;
@@ -299,8 +290,41 @@ namespace OfCourseIStillLoveYou
             RepositionWindow(ref _windowRect);
         }
 
+        private Rect DrawTexture()
+        {
+            var imageRect = new Rect(2, 20, _adjCamImageSize, _adjCamImageSize);
+
+
+            GUI.DrawTexture(imageRect, TargetCamRenderTexture, ScaleMode.StretchToFill, false);
+            return imageRect;
+        }
+
+        private void DrawTelemetry(Rect imageRect)
+        {
+            if (MinimalUI) return;
+
+            var dataStyle = new GUIStyle(TelemetryGuiStyle)
+            {
+                fontSize = (int) Mathf.Clamp(16 * TargetWindowScale, 9, 17),
+            };
+
+            var targetRangeRect = new Rect(imageRect.x,
+                _adjCamImageSize * 0.94f - (int) Mathf.Clamp(18 * TargetWindowScale, 9, 18), _adjCamImageSize,
+                (int) Mathf.Clamp(18 * TargetWindowScale, 10, 18));
+
+            var sb = new StringBuilder();
+            sb.AppendLine(AltitudeString);
+            sb.AppendLine(SpeedString);
+
+            GUI.Label(targetRangeRect, sb.ToString(), dataStyle);
+        }
+
+        public bool MinimalUI { get; set; } = false;
+
         private void DrawSideControlButtons(Rect imageRect)
         {
+            if (MinimalUI) return;
+
             var buttonStyle = new GUIStyle(HighLogic.Skin.button);
             buttonStyle.fontSize = 10;
             buttonStyle.wordWrap = true;
@@ -343,7 +367,14 @@ namespace OfCourseIStillLoveYou
 
         private void ResizeTargetWindow()
         {
-            _windowWidth = camImageSize * TargetWindowScale + 3 * buttonHeight + 16 + 2 * gap;
+            if (MinimalUI)
+            {
+                _windowWidth = camImageSize * TargetWindowScale + 2 * gap;
+            }
+            else
+            {
+                _windowWidth = camImageSize * TargetWindowScale + 3 * buttonHeight + 16 + 2 * gap;
+            }
             _windowHeight = camImageSize * TargetWindowScale + 23;
             _windowRect = new Rect(_windowRect.x, _windowRect.y, _windowWidth, _windowHeight);
         }
