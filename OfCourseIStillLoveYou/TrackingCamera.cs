@@ -13,14 +13,23 @@ namespace OfCourseIStillLoveYou
 {
     public class TrackingCamera
     {
-        private static readonly float buttonHeight = 18;
-        private static readonly float gap = 2;
+        private const float ButtonHeight = 18;
+        private const float gap = 2;
+        private const float Line = ButtonHeight + gap;
+        private const float ButtonWidth = 3 * ButtonHeight + 4 * gap;
+
         private static readonly float controlsStartY = 22;
         private static readonly Font TelemetryFont = Font.CreateDynamicFontFromOSFont("Bahnschrift Semibold", 17);
 
+        private static readonly GUIStyle ButtonStyle = new GUIStyle(HighLogic.Skin.button)
+            {fontSize = 10, wordWrap = true};
+
+
         private static readonly GUIStyle TelemetryGuiStyle = new GUIStyle()
             {alignment = TextAnchor.MiddleCenter, normal = new GUIStyleState() {textColor = Color.white}, fontStyle = FontStyle.Bold, font = TelemetryFont };
-    
+
+        private static readonly GUIStyle ButtonGuiStyle = new GUIStyle()
+            { alignment = TextAnchor.MiddleCenter, normal = new GUIStyleState() { textColor = Color.white }, fontStyle = FontStyle.Bold, font = TelemetryFont };
 
 
 
@@ -55,7 +64,7 @@ namespace OfCourseIStillLoveYou
 
             TargetCamRenderTexture.antiAliasing = 1;
             TargetCamRenderTexture.Create();
-            _windowWidth = _adjCamImageSize + 3 * buttonHeight + 16 + 2 * gap;
+            _windowWidth = _adjCamImageSize + 3 * ButtonHeight + 16 + 2 * gap;
             _windowHeight = _adjCamImageSize + 23;
             _windowRect = new Rect(Screen.width - _windowWidth, Screen.height - _windowHeight, _windowWidth,
                 _windowHeight);
@@ -239,18 +248,13 @@ namespace OfCourseIStillLoveYou
         {
             if (!Enabled) return;
 
-            var windowScale = TargetWindowScale;
-            _adjCamImageSize = camImageSize * windowScale;
+            _adjCamImageSize = camImageSize * TargetWindowScale;
 
-
-            WindowIsOpen = true;
-            
             GUI.DragWindow(new Rect(0, 0, _windowHeight - 18, 30));
             if (GUI.Button(new Rect(_windowWidth - 18, 2, 20, 16), "X", GUI.skin.button))
             {
                 Disable();
-
-
+                
                 return;
             }
 
@@ -312,11 +316,8 @@ namespace OfCourseIStillLoveYou
                 _adjCamImageSize * 0.94f - (int) Mathf.Clamp(18 * TargetWindowScale, 9, 18), _adjCamImageSize,
                 (int) Mathf.Clamp(18 * TargetWindowScale, 10, 18));
 
-            var sb = new StringBuilder();
-            sb.AppendLine(AltitudeString);
-            sb.AppendLine(SpeedString);
 
-            GUI.Label(targetRangeRect, sb.ToString(), dataStyle);
+            GUI.Label(targetRangeRect, String.Concat(AltitudeString, Environment.NewLine, SpeedString), dataStyle);
         }
 
         public bool MinimalUI { get; set; } = false;
@@ -325,23 +326,16 @@ namespace OfCourseIStillLoveYou
         {
             if (MinimalUI) return;
 
-            var buttonStyle = new GUIStyle(HighLogic.Skin.button);
-            buttonStyle.fontSize = 10;
-            buttonStyle.wordWrap = true;
-
-            var line = buttonHeight + gap;
-            var buttonWidth = 3 * buttonHeight + 4 * gap;
-            //groundStablize button
             var startX = imageRect.width + 3 * gap;
-            var streamingRect = new Rect(startX, controlsStartY, buttonWidth, buttonHeight + line);
+            var streamingRect = new Rect(startX, controlsStartY, ButtonWidth, ButtonHeight + Line);
 
             if (!StreamingEnabled)
             {
-                if (GUI.Button(streamingRect, "Enable streaming", buttonStyle)) StreamingEnabled = true;
+                if (GUI.Button(streamingRect, "Enable streaming", ButtonStyle)) StreamingEnabled = true;
             }
             else
             {
-                if (GUI.Button(streamingRect, "Disable streaming", buttonStyle)) StreamingEnabled = false;
+                if (GUI.Button(streamingRect, "Disable streaming", ButtonStyle)) StreamingEnabled = false;
             }
         }
 
@@ -373,7 +367,7 @@ namespace OfCourseIStillLoveYou
             }
             else
             {
-                _windowWidth = camImageSize * TargetWindowScale + 3 * buttonHeight + 16 + 2 * gap;
+                _windowWidth = camImageSize * TargetWindowScale + 3 * ButtonHeight + 16 + 2 * gap;
             }
             _windowHeight = camImageSize * TargetWindowScale + 23;
             _windowRect = new Rect(_windowRect.x, _windowRect.y, _windowWidth, _windowHeight);

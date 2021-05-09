@@ -8,6 +8,7 @@ namespace OfCourseIStillLoveYou
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class Gui : MonoBehaviour
     {
+        private const string ModTitle = "Of Course I Still Love you";
         private const float WindowWidth = 250;
         private const float DraggableHeight = 40;
         private const float LeftIndent = 12;
@@ -21,6 +22,15 @@ namespace OfCourseIStillLoveYou
         private float _windowHeight = 250;
         private Rect _windowRect;
 
+  
+        private static readonly GUIStyle CenterLabelStyle = new GUIStyle()
+        { alignment = TextAnchor.UpperCenter, normal = { textColor = Color.white } };
+
+        private static readonly GUIStyle TitleStyle = new GUIStyle(CenterLabelStyle)
+        {
+            fontSize = 10,
+            alignment = TextAnchor.MiddleCenter
+        };
 
         void Awake()
         {
@@ -112,23 +122,12 @@ namespace OfCourseIStillLoveYou
 
         private void DrawTitle()
         {
-            var centerLabel = new GUIStyle
-            {
-                alignment = TextAnchor.UpperCenter,
-                normal = {textColor = Color.white}
-            };
-            var titleStyle = new GUIStyle(centerLabel)
-            {
-                fontSize = 10,
-                alignment = TextAnchor.MiddleCenter
-            };
-            GUI.Label(new Rect(0, 0, WindowWidth, 20), "Of Course I Still Love you", titleStyle);
+            GUI.Label(new Rect(0, 0, WindowWidth, 20), ModTitle, TitleStyle);
         }
 
         private void DrawCameraButton(MuMechModuleHullCamera camera, int line)
         {
             var saveRect = new Rect(LeftIndent, ContentTop + line * entryHeight, contentWidth, entryHeight);
-
 
             if (GUI.Button(saveRect, GetCameraName(camera))) OpenCameraInstance(camera);
         }
