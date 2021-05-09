@@ -10,11 +10,11 @@
   <Panel Background="Black"  >
     <Image Name="imgCameraTexture" PointerPressed="InputElement_OnPointerPressed" Stretch="Uniform" Source="/Assets/OfCourseIStillLoveYou.png"   ClipToBounds="true"  DoubleTapped="ImgCameraTexture_OnDoubleTapped"></Image>
     <DockPanel  Margin="10" ClipToBounds="True" >
-      <Label Name="labelCameras" Content="SELECT A CAMERA" Foreground="White" FontSize="14" FontFamily="Calibri" FontWeight="400"></Label>
+      <Label Name="labelCameras" Content="SELECT A CAMERA" Foreground="White" FontSize="14" FontFamily="Bahnschrift Semibold" FontWeight="400"></Label>
       <ComboBox Name="cbCameras" Margin="5,0,0,0" MinWidth="150"></ComboBox>
     </DockPanel>
 
-    <Label Foreground="White" FontSize="34" Margin="50" FontFamily="Calibri" FontWeight="400" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+    <Label Foreground="White" FontSize="34" Margin="50" FontFamily="Bahnschrift Semibold" FontWeight="400" VerticalAlignment="Bottom" HorizontalAlignment="Center">
         <TextBlock Name="TextInfo" Text="SPEEED ALTITUDE" TextWrapping="Wrap" MaxWidth="400" TextAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled"></TextBlock>
     </Label>
       
