@@ -11,11 +11,11 @@
     <Image Name="imgCameraTexture" PointerPressed="InputElement_OnPointerPressed" Stretch="Uniform" Source="/Assets/OfCourseIStillLoveYou.png"   ClipToBounds="true"  DoubleTapped="ImgCameraTexture_OnDoubleTapped"></Image>
     <DockPanel  Margin="10" ClipToBounds="True" >
       <Label Name="labelCameras" Content="SELECT A CAMERA" Foreground="White" FontSize="14" FontFamily="Bahnschrift Semibold" FontWeight="400"></Label>
-      <ComboBox Name="cbCameras" Margin="5,0,0,0" MinWidth="150"></ComboBox>
+      <ComboBox Name="cbCameras" Margin="5,0,0,0" MinWidth="150" FontFamily="Bahnschrift Semibold"></ComboBox>
     </DockPanel>
 
     <Label Foreground="White" FontSize="34" Margin="50" FontFamily="Bahnschrift Semibold" FontWeight="400" VerticalAlignment="Bottom" HorizontalAlignment="Center">
-        <TextBlock Name="TextInfo" Text="SPEEED ALTITUDE" TextWrapping="Wrap" MaxWidth="400" TextAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled"></TextBlock>
+        <TextBlock Name="TextInfo" Text="SPEEED ALTITUDE" TextWrapping="Wrap" MaxWidth="400" FontFamily="Bahnschrift Semibold"  TextAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled"></TextBlock>
     </Label>
       
       <Image Name="imgResize" Height="32" Width="32" HorizontalAlignment="Right" VerticalAlignment="Bottom" Source="/Assets/resizeSquare.png" PointerPressed="ImgResize_OnPointerPressed"></Image>
