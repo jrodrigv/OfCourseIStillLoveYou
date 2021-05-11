@@ -16,7 +16,7 @@ KSP mod to display hullcam cameras views on different GUI inside or outside the 
 
 ## Highly recommended mods:
 * Physics Range Extender
-* Latest Scatterer https://github.com/LGhassen/Scatterer/releases
+* Scatterer 0.0767 or newer https://github.com/LGhassen/Scatterer/releases
 * If you want to use TUFX you need to use this version -> TUFX JR edition https://github.com/jrodrigv/TUFX/releases 
 
 ## Mod Only Installation:
