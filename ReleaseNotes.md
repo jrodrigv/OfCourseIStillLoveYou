@@ -1,3 +1,2 @@
-* In-game Camera UI Minimalistic view: Now you can hide the buttons and telemetry by doing a Double-Click on the camera view
-* Telemetry font changed to use Bahnschrift Semibold in both Desktop UI and In-game UI.
-* Performance improvements: Up to 25% more FPS. Now OCISLY is prepared to use Scatterer 0.0767 pre-release, improved UI code.
+* Desktop client streaming is now be automatically recovered when doing things like F3/Pause.
+* Bahnschrift Semibold to all fonts in Desktop client.
