@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -30,6 +31,7 @@ namespace OfCourseIStillLoveYou.DesktopClient
 
         private bool statusUnstable;
         private Bitmap? texture;
+        private string? previousSelectedCamera;
 
         public MainWindow()
         {
@@ -176,6 +178,13 @@ namespace OfCourseIStillLoveYou.DesktopClient
 
         private void NotifyUnstableCameraFeed()
         {
+            var cbCameras = this.FindControl<ComboBox>("cbCameras");
+
+            if (!String.IsNullOrEmpty(cbCameras.SelectedItem?.ToString()))
+            {
+                previousSelectedCamera = cbCameras.SelectedItem.ToString();
+            }
+
             TextBlock textInfo = this.FindControl<TextBlock>("TextInfo");
             textInfo.Text = "VIDEO CONNECTION HAS BEEN LOST. RIP";
         }
@@ -190,10 +199,12 @@ namespace OfCourseIStillLoveYou.DesktopClient
         {
             var cbCameras = this.FindControl<ComboBox>("cbCameras");
             cbCameras.Items = cameraIds;
+            
 
-            if (cbCameras.SelectedItem != null && !cameraIds.Contains(cbCameras.SelectedItem.ToString()))
+            if (!String.IsNullOrEmpty(previousSelectedCamera) && cameraIds.Contains(previousSelectedCamera))
             {
-                cbCameras.SelectedItem = "";
+                cbCameras.SelectedItem = previousSelectedCamera;
+                previousSelectedCamera = "";
             }
 
         }
