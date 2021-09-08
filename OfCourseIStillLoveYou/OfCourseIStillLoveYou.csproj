@@ -37,8 +37,8 @@
       <HintPath>Dependencies\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="HullCamera">
-      <HintPath>Dependencies\HullCamera.dll</HintPath>
+    <Reference Include="HullcamVDSContinued">
+      <HintPath>Dependencies\HullcamVDSContinued.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="KSPAssets">
@@ -111,6 +111,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TgpCamRotator.cs" />
     <Compile Include="Core.cs" />
@@ -127,9 +128,7 @@
       <Name>OfCourseIStillLoveYou.TUFX</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
@@ -178,16 +177,16 @@ MD $(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\
 xcopy /E /Y "$(ProjectDir)"Dependencies\win\grpc_csharp_ext.dll "$(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\"
 </PreBuildEvent>
   </PropertyGroup>
-  <Target Name="BeforeBuild">
-    <ItemGroup>
-      <AssemblyAttributes Include="AssemblyVersion">
-        <_Parameter1>$(Version)</_Parameter1>
-      </AssemblyAttributes>
-    </ItemGroup>
-    <MakeDir Directories="$(IntermediateOutputPath)" />
-    <WriteCodeFragment Language="C#" OutputFile="$(IntermediateOutputPath)Version.cs" AssemblyAttributes="@(AssemblyAttributes)" />
-    <ItemGroup>
-      <Compile Include="$(IntermediateOutputPath)Version.cs" />
-    </ItemGroup>
-  </Target>
+  <!-- <Target Name="BeforeBuild"> -->
+    <!-- <ItemGroup> -->
+      <!-- <AssemblyAttributes Include="AssemblyVersion"> -->
+        <!-- <_Parameter1>$(Version)</_Parameter1> -->
+      <!-- </AssemblyAttributes> -->
+    <!-- </ItemGroup> -->
+    <!-- <MakeDir Directories="$(IntermediateOutputPath)" /> -->
+    <!-- <WriteCodeFragment Language="C#" OutputFile="$(IntermediateOutputPath)Version.cs" AssemblyAttributes="@(AssemblyAttributes)" /> -->
+    <!-- <ItemGroup> -->
+      <!-- <Compile Include="$(IntermediateOutputPath)Version.cs" /> -->
+    <!-- </ItemGroup> -->
+  <!-- </Target> -->
 </Project>
