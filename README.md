@@ -10,7 +10,7 @@
 KSP mod to display hullcam cameras views on different GUI inside or outside the game using a Desktop app and Server app.
 
 ## Requirements:
-* KSP 1.11.2
+* KSP 1.12.2
 * NET 5 runtime https://dotnet.microsoft.com/download/dotnet/5.0
 * Latest HullcamVDS https://github.com/linuxgurugamer/HullcamVDSContinued/releases
 
