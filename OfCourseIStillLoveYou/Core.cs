@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using HullcamVDS;
 using OfCourseIStillLoveYou.Client;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace OfCourseIStillLoveYou
 {

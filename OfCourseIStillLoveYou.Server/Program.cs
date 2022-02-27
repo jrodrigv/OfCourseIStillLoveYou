@@ -63,9 +63,15 @@ namespace OfCourseIStillLoveYou.Server
             try
             {
                 for (var i = 0; i < args.Length; i++)
-                    if (args[i].Equals("--port"))
-                        _port = int.Parse(args[i + 1]);
-                    else if (args[i].Equals("--endpoint")) _serverEndpoint = args[i + 1];
+                    switch (args[i])
+                    {
+                        case "--port":
+                            _port = int.Parse(args[i + 1]);
+                            break;
+                        case "--endpoint":
+                            _serverEndpoint = args[i + 1];
+                            break;
+                    }
             }
             catch (Exception)
             {

@@ -4,22 +4,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800" Width="800" Height="800"
         x:Class="OfCourseIStillLoveYou.DesktopClient.MainWindow"
-        Title="OfCourseIStillLoveYou.DesktopClient" Name="MainWindow" SystemDecorations="None" CanResize="True" >
+        Title="OfCourseIStillLoveYou.DesktopClient" Name="MainWindow" SystemDecorations="None" CanResize="True" Closing="Window_OnClosing" >
 
 
   <Panel Background="Black"  >
-    <Image Name="imgCameraTexture" PointerPressed="InputElement_OnPointerPressed" Stretch="Uniform" Source="/Assets/OfCourseIStillLoveYou.png"   ClipToBounds="true"  DoubleTapped="ImgCameraTexture_OnDoubleTapped"></Image>
+    <Image Name="ImgCameraTexture" PointerPressed="InputElement_OnPointerPressed" Stretch="Uniform" Source="/Assets/OfCourseIStillLoveYou.png"   ClipToBounds="true"  DoubleTapped="ImgCameraTexture_OnDoubleTapped"></Image>
     <DockPanel  Margin="10" ClipToBounds="True" >
-      <Label Name="labelCameras" Content="SELECT A CAMERA" Foreground="White" FontSize="14" FontFamily="Bahnschrift Semibold" FontWeight="400"></Label>
-      <ComboBox Name="cbCameras" Margin="5,0,0,0" MinWidth="150" FontFamily="Bahnschrift Semibold"></ComboBox>
+      <Label Name="LabelCameras" Content="SELECT A CAMERA" Foreground="White" FontSize="14" FontFamily="Bahnschrift Semibold" FontWeight="400"></Label>
+      <ComboBox Name="CbCameras" Margin="5,0,0,0" MinWidth="150" FontFamily="Bahnschrift Semibold"></ComboBox>
     </DockPanel>
 
     <Label Foreground="White" FontSize="34" Margin="50" FontFamily="Bahnschrift Semibold" FontWeight="400" VerticalAlignment="Bottom" HorizontalAlignment="Center">
         <TextBlock Name="TextInfo" Text="SPEEED ALTITUDE" TextWrapping="Wrap" MaxWidth="400" FontFamily="Bahnschrift Semibold"  TextAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled"></TextBlock>
     </Label>
       
-      <Image Name="imgResize" Height="32" Width="32" HorizontalAlignment="Right" VerticalAlignment="Bottom" Source="/Assets/resizeSquare.png" PointerPressed="ImgResize_OnPointerPressed"></Image>
-      <Image Name="imgClose" Height="32" Width="32" HorizontalAlignment="Right" VerticalAlignment="Top" Source="/Assets/close.png" Tapped="ImgClose_OnTapped"></Image>
+      <Image Name="ImgResize" Height="32" Width="32" HorizontalAlignment="Right" VerticalAlignment="Bottom" Source="/Assets/resizeSquare.png" PointerPressed="ImgResize_OnPointerPressed"></Image>
+      <Image Name="ImgClose" Height="32" Width="32" HorizontalAlignment="Right" VerticalAlignment="Top" Source="/Assets/close.png" Tapped="ImgClose_OnTapped"></Image>
   </Panel>
 
 </Window>

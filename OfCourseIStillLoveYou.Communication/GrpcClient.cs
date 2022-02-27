@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Grpc.Core;
+// ReSharper disable All
 
 namespace OfCourseIStillLoveYou.Communication
 {

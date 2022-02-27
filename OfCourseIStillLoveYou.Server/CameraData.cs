@@ -18,7 +18,7 @@
 
         public override bool Equals(object obj)
         {
-            return ((CameraData)obj).CameraId.Equals(CameraId);
+            return ((CameraData)obj)!.CameraId.Equals(CameraId);
         }
 
         public override int GetHashCode()

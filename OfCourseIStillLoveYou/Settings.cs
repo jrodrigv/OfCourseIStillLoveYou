@@ -11,7 +11,7 @@ namespace OfCourseIStillLoveYou
 
         public static string EndPoint { get; set; }
 
-        public static bool ConfigLoaded { get; set; } = false;
+        public static bool ConfigLoaded { get; set; }
 
         void Awake()
         {

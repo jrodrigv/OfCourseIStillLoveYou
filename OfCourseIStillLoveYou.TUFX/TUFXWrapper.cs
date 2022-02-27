@@ -5,7 +5,7 @@ using UnityEngine.Rendering.PostProcessing;
 
 namespace OfCourseIStillLoveYou.TUFX
 {
-    public static class TUFXWrapper
+    public static class TufxWrapper
     {
         public static void AddPostProcessing (Camera c)
         {

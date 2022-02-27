@@ -6,8 +6,6 @@ namespace OfCourseIStillLoveYou.Client
 {
     public static class GrpcClient
     {
-
-
         public static CameraStream.CameraStreamClient Client { get; set; }
 
         public static void ConnectToServer(string endpoint = "localhost", int port = 50777)
@@ -16,7 +14,7 @@ namespace OfCourseIStillLoveYou.Client
 
             Client = new CameraStream.CameraStreamClient(channel);
 
-            Debug.Log($"[OfCourseIStillLoveYou]: GrpcClient Connected to Server");
+            Debug.Log("[OfCourseIStillLoveYou]: GrpcClient Connected to Server");
         }
 
         public static void SendCameraTextureAsync(CameraData cameraData)

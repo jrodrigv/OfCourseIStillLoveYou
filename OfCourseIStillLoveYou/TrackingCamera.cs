@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using HullcamVDS;
 using OfCourseIStillLoveYou.Client;
@@ -14,9 +13,9 @@ namespace OfCourseIStillLoveYou
     public class TrackingCamera
     {
         private const float ButtonHeight = 18;
-        private const float gap = 2;
-        private const float Line = ButtonHeight + gap;
-        private const float ButtonWidth = 3 * ButtonHeight + 4 * gap;
+        private const float Gap = 2;
+        private const float Line = ButtonHeight + Gap;
+        private const float ButtonWidth = 3 * ButtonHeight + 4 * Gap;
 
         private static readonly float controlsStartY = 22;
         private static readonly Font TelemetryFont = Font.CreateDynamicFontFromOSFont("Bahnschrift Semibold", 17);
@@ -47,11 +46,11 @@ namespace OfCourseIStillLoveYou
         private Rect _windowRect;
         private float _windowWidth;
 
-        private readonly WaitForEndOfFrame frameEnd = new WaitForEndOfFrame();
-        private readonly WaitForSeconds fixedDelay = new WaitForSeconds(0.030f);
-        private byte[] jpgTexture;
+        private readonly WaitForEndOfFrame _frameEnd = new WaitForEndOfFrame();
+        private readonly WaitForSeconds _fixedDelay = new WaitForSeconds(0.030f);
+        private byte[] _jpgTexture;
         public RenderTexture TargetCamRenderTexture;
-        private readonly Texture2D texture2D = new Texture2D(768, 768, TextureFormat.ARGB32, false);
+        private readonly Texture2D _texture2D = new Texture2D(768, 768, TextureFormat.ARGB32, false);
 
         
 
@@ -60,11 +59,13 @@ namespace OfCourseIStillLoveYou
             Id = id;
             _hullcamera = hullcamera;
 
-            TargetCamRenderTexture = new RenderTexture(768, 768, 24, RenderTextureFormat.ARGB32);
+            TargetCamRenderTexture = new RenderTexture(768, 768, 24, RenderTextureFormat.ARGB32)
+            {
+                antiAliasing = 1
+            };
 
-            TargetCamRenderTexture.antiAliasing = 1;
             TargetCamRenderTexture.Create();
-            _windowWidth = _adjCamImageSize + 3 * ButtonHeight + 16 + 2 * gap;
+            _windowWidth = _adjCamImageSize + 3 * ButtonHeight + 16 + 2 * Gap;
             _windowHeight = _adjCamImageSize + 23;
             _windowRect = new Rect(Screen.width - _windowWidth, Screen.height - _windowHeight, _windowWidth,
                 _windowHeight);
@@ -88,8 +89,6 @@ namespace OfCourseIStillLoveYou
 
         public bool ResizingWindow { get; set; }
 
-        public bool WindowIsOpen { get; set; }
-
         public float TargetWindowScale { get; set; } = 1;
         public string AltitudeString { get; private set; }
         public string SpeedString { get; private set; }
@@ -109,23 +108,23 @@ namespace OfCourseIStillLoveYou
         {
             while (Enabled)
             {
-                yield return fixedDelay;
+                yield return _fixedDelay;
 
                 if (!Enabled) yield return null;
 
                 RenderCameras();
 
-                yield return frameEnd;
+                yield return _frameEnd;
 
                 if (!StreamingEnabled) continue;
 
-                Graphics.CopyTexture(TargetCamRenderTexture, texture2D);
+                Graphics.CopyTexture(TargetCamRenderTexture, _texture2D);
 
-                AsyncGPUReadback.Request(texture2D, 0,
+                AsyncGPUReadback.Request(_texture2D, 0,
                     request =>
                     {
-                        Task.Run(() => texture2D.LoadRawTextureData(request.GetData<byte>()))
-                            .ContinueWith(previous => jpgTexture = texture2D.EncodeToJPG())
+                        Task.Run(() => _texture2D.LoadRawTextureData(request.GetData<byte>()))
+                            .ContinueWith(previous => _jpgTexture = _texture2D.EncodeToJPG())
                             .ContinueWith(previous =>
                                 GrpcClient.SendCameraTextureAsync(new CameraData
                                 {
@@ -133,7 +132,7 @@ namespace OfCourseIStillLoveYou
                                     CameraName = Name,
                                     Speed = SpeedString,
                                     Altitude = AltitudeString,
-                                    Texture = jpgTexture
+                                    Texture = _jpgTexture
                                 }));
                     }
                 );
@@ -202,7 +201,8 @@ namespace OfCourseIStillLoveYou
             var camRotatorgalaxy = galaxyCamObj.AddComponent<TgpCamRotator>();
             camRotatorgalaxy.NearCamera = partNearCamera;
 
-            for (var i = 0; i < _cameras.Length; i++) _cameras[i].enabled = false;
+            foreach (var t in _cameras)
+                t.enabled = false;
         }
 
 
@@ -210,7 +210,7 @@ namespace OfCourseIStillLoveYou
         {
             try
             {
-                TUFXWrapper.AddPostProcessing(_cameras[0]);
+                TufxWrapper.AddPostProcessing(_cameras[0]);
             }
             catch
             {
@@ -275,7 +275,7 @@ namespace OfCourseIStillLoveYou
 
             if (Event.current.type == EventType.MouseDown && Event.current.clickCount == 2 && imageRect.Contains(Event.current.mousePosition))
             {
-                MinimalUI = !MinimalUI;
+                MinimalUi = !MinimalUi;
                 ResizeTargetWindow();
             }
 
@@ -305,7 +305,7 @@ namespace OfCourseIStillLoveYou
 
         private void DrawTelemetry(Rect imageRect)
         {
-            if (MinimalUI) return;
+            if (MinimalUi) return;
 
             var dataStyle = new GUIStyle(TelemetryGuiStyle)
             {
@@ -320,13 +320,13 @@ namespace OfCourseIStillLoveYou
             GUI.Label(targetRangeRect, String.Concat(AltitudeString, Environment.NewLine, SpeedString), dataStyle);
         }
 
-        public bool MinimalUI { get; set; } = false;
+        public bool MinimalUi { get; set; }
 
         private void DrawSideControlButtons(Rect imageRect)
         {
-            if (MinimalUI) return;
+            if (MinimalUi) return;
 
-            var startX = imageRect.width + 3 * gap;
+            var startX = imageRect.width + 3 * Gap;
             var streamingRect = new Rect(startX, controlsStartY, ButtonWidth, ButtonHeight + Line);
 
             if (!StreamingEnabled)
@@ -361,13 +361,13 @@ namespace OfCourseIStillLoveYou
 
         private void ResizeTargetWindow()
         {
-            if (MinimalUI)
+            if (MinimalUi)
             {
-                _windowWidth = camImageSize * TargetWindowScale + 2 * gap;
+                _windowWidth = camImageSize * TargetWindowScale + 2 * Gap;
             }
             else
             {
-                _windowWidth = camImageSize * TargetWindowScale + 3 * ButtonHeight + 16 + 2 * gap;
+                _windowWidth = camImageSize * TargetWindowScale + 3 * ButtonHeight + 16 + 2 * Gap;
             }
             _windowHeight = camImageSize * TargetWindowScale + 23;
             _windowRect = new Rect(_windowRect.x, _windowRect.y, _windowWidth, _windowHeight);

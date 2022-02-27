@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -15,240 +14,229 @@ using Avalonia.Threading;
 using Avalonia.Visuals.Media.Imaging;
 using OfCourseIStillLoveYou.Communication;
 
-namespace OfCourseIStillLoveYou.DesktopClient
+namespace OfCourseIStillLoveYou.DesktopClient;
+
+public class MainWindow : Window
 {
-    public class MainWindow : Window
+    private const int Delay = 17;
+    private const string SettingPath = "settings.json";
+    private const string Endpoint = "localhost";
+    private const int Port = 5077;
+    private string? _currentCamera;
+
+    private Bitmap? _initialImage;
+    private string? _previousSelectedCamera;
+
+    private SettingsPoco? _settings;
+
+    private bool _statusUnstable;
+    private Bitmap? _texture;
+
+    public MainWindow()
     {
-        private const int Delay = 30;
-        private const string SettingPath = "settings.json";
-        private const string Endpoint = "localhost";
-        private const int Port = 5077;
-        private string? currentCamera;
-
-        private Bitmap? initialImage;
-
-        private SettingsPoco? settings;
-
-        private bool statusUnstable;
-        private Bitmap? texture;
-        private string? previousSelectedCamera;
-
-        public MainWindow()
-        {
-            InitializeComponent();
+        InitializeComponent();
 #if DEBUG
             this.AttachDevTools();
 #endif
-        }
+    }
 
-        public CameraData? CurretCameraData { get; private set; }
+    public bool IsClosing { get; set; }
 
-        private void InitializeComponent()
+    public CameraData? CurretCameraData { get; private set; }
+
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
+        StoreInitialImage();
+        ReadSettings();
+
+        if (_settings != null) GrpcClient.ConnectToServer(_settings.EndPoint, _settings.Port);
+
+        Task.Run(CameraFetchWorker);
+        Task.Run(CameraTextureWorker);
+    }
+
+    private void ReadSettings()
+    {
+        try
         {
-            AvaloniaXamlLoader.Load(this);
-            StoreInitialImage();
-            ReadSettings();
-
-            if (settings != null) GrpcClient.ConnectToServer(settings.EndPoint, settings.Port);
-
-            Task.Run(CameraFetchWorker);
-            Task.Run(CameraTextureWorker);
+            var settingsText = File.ReadAllText(SettingPath);
+            _settings = JsonSerializer.Deserialize<SettingsPoco>(settingsText);
         }
-
-        private void ReadSettings()
+        catch (Exception)
         {
-            try
-            {
-                var settingsText = File.ReadAllText(SettingPath);
-                settings = JsonSerializer.Deserialize<SettingsPoco>(settingsText);
-            }
-            catch (Exception)
-            {
-                settings = new SettingsPoco {EndPoint = Endpoint, Port = Port};
-            }
+            _settings = new SettingsPoco { EndPoint = Endpoint, Port = Port };
         }
+    }
 
-        private void StoreInitialImage()
+    private void StoreInitialImage()
+    {
+        Dispatcher.UIThread.InvokeAsync(() =>
+            _initialImage = (Bitmap)this.FindControl<Image>("ImgCameraTexture").Source);
+    }
+
+    private void CameraTextureWorker()
+    {
+        while (!IsClosing)
         {
-            Dispatcher.UIThread.InvokeAsync(() =>
-                initialImage = (Bitmap) this.FindControl<Image>("imgCameraTexture").Source);
-        }
+            Task.Delay(Delay).Wait();
 
-        private void CameraTextureWorker()
-        {
-            while (true)
-            {
-                Task.Delay(Delay).Wait();
-
-                if (string.IsNullOrEmpty(currentCamera)) continue;
+            if (string.IsNullOrEmpty(_currentCamera)) continue;
 
 
-                Dispatcher.UIThread
-                    .InvokeAsync(() => this.FindControl<Image>("imgCameraTexture").DesiredSize.Height)
-                    .ContinueWith(imageHeight =>
+            Dispatcher.UIThread
+                .InvokeAsync(() => this.FindControl<Image>("ImgCameraTexture").DesiredSize.Height)
+                .ContinueWith(imageHeight =>
+                {
+                    GrpcClient.GetCameraDataAsync(_currentCamera).ContinueWith(camaraData =>
                     {
-                        GrpcClient.GetCameraDataAsync(currentCamera).ContinueWith(camaraData =>
+                        if (camaraData.Result.Texture == null)
                         {
-                            if (camaraData.Result.Texture == null)
+                            _texture = _initialImage;
+                        }
+                        else
+                        {
+                            using MemoryStream ms = new(camaraData.Result.Texture);
+                            _texture = Bitmap.DecodeToHeight(ms, (int)imageHeight.Result,
+                                BitmapInterpolationMode.MediumQuality);
+                        }
+
+                        CurretCameraData = camaraData.Result;
+                    }).ContinueWith(_ =>
+                        Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            this.FindControl<Image>("ImgCameraTexture").Source = _texture;
+
+                            if (CurretCameraData?.Texture == null)
                             {
-                                texture = initialImage;
+                                _statusUnstable = true;
                             }
                             else
                             {
-                                using MemoryStream ms = new(camaraData.Result.Texture);
-                                texture = Bitmap.DecodeToHeight(ms, (int) imageHeight.Result,
-                                    BitmapInterpolationMode.MediumQuality);
+                                _statusUnstable = false;
+
+                                var textInfo = this.FindControl<TextBlock>("TextInfo");
+                                StringBuilder sb = new();
+                                sb.AppendLine(CurretCameraData.Altitude);
+                                sb.AppendLine(CurretCameraData.Speed);
+                                textInfo.Text = sb.ToString();
+
+                                var window = this.FindControl<Window>("MainWindow");
+                                window.Title = CurretCameraData.CameraName;
                             }
-
-                            CurretCameraData = camaraData.Result;
-                        }).ContinueWith(_ =>
-                            Dispatcher.UIThread.InvokeAsync(() =>
-                            {
-                                this.FindControl<Image>("imgCameraTexture").Source = texture;
-
-                                if (CurretCameraData?.Texture == null)
-                                {
-                                    statusUnstable = true;
-                                }
-                                else
-                                {
-                                    statusUnstable = false;
-
-                                    TextBlock textInfo = this.FindControl<TextBlock>("TextInfo");
-                                    StringBuilder sb = new();
-                                    sb.AppendLine(CurretCameraData.Altitude);
-                                    sb.AppendLine(CurretCameraData.Speed);
-                                    textInfo.Text = sb.ToString();
-
-                                    Window window = this.FindControl<Window>("MainWindow");
-                                    window.Title = CurretCameraData.CameraName;
-                                }
-                            }));
-                    });
-            }
+                        }));
+                });
         }
+    }
 
-        private void CameraFetchWorker()
+    private void CameraFetchWorker()
+    {
+        while (!IsClosing)
         {
-            while (true)
+            Task.Delay(1000).Wait();
+            try
             {
-                Task.Delay(1000).Wait();
-                try
+                var cameraIds = GrpcClient.GetCameraIds();
+
+                if (_statusUnstable)
+                    Dispatcher.UIThread.InvokeAsync(NotifyUnstableCameraFeed);
+                else if (cameraIds == null || cameraIds.Count == 0)
+                    Dispatcher.UIThread.InvokeAsync(NotifyWaitingForCameraFeed);
+
+                Dispatcher.UIThread.InvokeAsync(() =>
                 {
-                    var cameraIds = GrpcClient.GetCameraIds();
+                    if (cameraIds != null) UpdateCameraList(cameraIds);
+                });
 
-                    if (statusUnstable)
-                    {
-                        Dispatcher.UIThread.InvokeAsync(NotifyUnstableCameraFeed);
-                    }
-                    else if ((cameraIds == null || cameraIds.Count == 0))
-                    {
-                        Dispatcher.UIThread.InvokeAsync(NotifyWaitingForCameraFeed);
-                    }
-                    
-                    Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        if (cameraIds != null) UpdateCameraList(cameraIds);
-                    });
-
-                    Dispatcher.UIThread.InvokeAsync(GetSelectedCamera).ContinueWith(selectedCamera =>
-                    {
-                        currentCamera = selectedCamera.Result;
-                    });
-
-                }
-                catch (Exception)
+                Dispatcher.UIThread.InvokeAsync(GetSelectedCamera).ContinueWith(selectedCamera =>
                 {
-                    Dispatcher.UIThread.InvokeAsync(NotifyConnectingToServer);
-                }
+                    _currentCamera = selectedCamera.Result;
+                });
+            }
+            catch (Exception)
+            {
+                Dispatcher.UIThread.InvokeAsync(NotifyConnectingToServer);
             }
         }
+    }
 
-        private string? GetSelectedCamera()
+    private string? GetSelectedCamera()
+    {
+        var cbCameras = this.FindControl<ComboBox>("CbCameras");
+        return cbCameras.SelectedItem == null ? string.Empty : cbCameras.SelectedItem.ToString();
+    }
+
+    private void NotifyWaitingForCameraFeed()
+    {
+        var textInfo = this.FindControl<TextBlock>("TextInfo");
+        textInfo.Text = "Waiting for camera feed...";
+    }
+
+    private void NotifyUnstableCameraFeed()
+    {
+        var cbCameras = this.FindControl<ComboBox>("CbCameras");
+
+        if (!string.IsNullOrEmpty(cbCameras.SelectedItem?.ToString()))
+            _previousSelectedCamera = cbCameras.SelectedItem.ToString();
+
+        var textInfo = this.FindControl<TextBlock>("TextInfo");
+        textInfo.Text = "VIDEO CONNECTION HAS BEEN LOST. RIP";
+    }
+
+    private void NotifyConnectingToServer()
+    {
+        var textInfo = this.FindControl<TextBlock>("TextInfo");
+        textInfo.Text = "Connecting to server...";
+    }
+
+    private void UpdateCameraList(List<string?> cameraIds)
+    {
+        var cbCameras = this.FindControl<ComboBox>("CbCameras");
+        cbCameras.Items = cameraIds;
+
+
+        if (string.IsNullOrEmpty(_previousSelectedCamera) || !cameraIds.Contains(_previousSelectedCamera)) return;
+
+
+        cbCameras.SelectedItem = _previousSelectedCamera;
+        _previousSelectedCamera = "";
+    }
+
+    private void ImgCameraTexture_OnDoubleTapped(object? sender, RoutedEventArgs e)
+    {
+        Dispatcher.UIThread.InvokeAsync(() =>
         {
-            var cbCameras = this.FindControl<ComboBox>("cbCameras");
-            return cbCameras.SelectedItem == null ? string.Empty : cbCameras.SelectedItem.ToString();
-        }
+            var textInfo = this.FindControl<TextBlock>("TextInfo");
+            var cbCameras = this.FindControl<ComboBox>("CbCameras");
+            var labelCameras = this.FindControl<Label>("LabelCameras");
+            var imgResize = this.FindControl<Image>("ImgResize");
+            var imgClose = this.FindControl<Image>("ImgClose");
 
-        private void NotifyWaitingForCameraFeed()
-        {
-            TextBlock textInfo = this.FindControl<TextBlock>("TextInfo");
-            textInfo.Text = "Waiting for camera feed...";
-        }
+            labelCameras.IsVisible = !labelCameras.IsVisible;
+            textInfo.IsVisible = !textInfo.IsVisible;
+            cbCameras.IsVisible = !cbCameras.IsVisible;
+            imgResize.IsVisible = !imgResize.IsVisible;
+            imgClose.IsVisible = !imgClose.IsVisible;
+        });
+    }
 
-        private void NotifyUnstableCameraFeed()
-        {
-            var cbCameras = this.FindControl<ComboBox>("cbCameras");
+    private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(e);
+    }
 
-            if (!String.IsNullOrEmpty(cbCameras.SelectedItem?.ToString()))
-            {
-                previousSelectedCamera = cbCameras.SelectedItem.ToString();
-            }
+    private void ImgResize_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginResizeDrag(WindowEdge.SouthEast, e);
+    }
 
-            TextBlock textInfo = this.FindControl<TextBlock>("TextInfo");
-            textInfo.Text = "VIDEO CONNECTION HAS BEEN LOST. RIP";
-        }
+    private void ImgClose_OnTapped(object? sender, RoutedEventArgs e)
+    {
+        Close();
+    }
 
-        private void NotifyConnectingToServer()
-        {
-            TextBlock textInfo = this.FindControl<TextBlock>("TextInfo");
-            textInfo.Text = "Connecting to server...";
-        }
-
-        private void UpdateCameraList(List<string?> cameraIds)
-        {
-            var cbCameras = this.FindControl<ComboBox>("cbCameras");
-            cbCameras.Items = cameraIds;
-            
-
-            if (!String.IsNullOrEmpty(previousSelectedCamera) && cameraIds.Contains(previousSelectedCamera))
-            {
-                cbCameras.SelectedItem = previousSelectedCamera;
-                previousSelectedCamera = "";
-            }
-
-        }
-
-        private void ImgCameraTexture_OnDoubleTapped(object? sender, RoutedEventArgs e)
-        {
-
-            Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                var textInfo = this.FindControl<TextBlock>("TextInfo");
-                var cbCameras = this.FindControl<ComboBox>("cbCameras");
-                var labelCameras = this.FindControl<Label>("labelCameras");
-                var imgResize = this.FindControl<Image>("imgResize");
-                var imgClose = this.FindControl<Image>("imgClose");
-
-                labelCameras.IsVisible = !labelCameras.IsVisible;
-                textInfo.IsVisible = !textInfo.IsVisible;
-                cbCameras.IsVisible = !cbCameras.IsVisible;
-                imgResize.IsVisible = !imgResize.IsVisible;
-                imgClose.IsVisible = !imgClose.IsVisible;
-
-            });
-        }
-
-        private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
-        {
-            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-            {
-                this.BeginMoveDrag(e);
-                
-            }
-        }
-
-        private void ImgResize_OnPointerPressed(object? sender, PointerPressedEventArgs e)
-        {
-            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-            {
-                this.BeginResizeDrag(WindowEdge.SouthEast, e);
-            }
-        }
-
-        private void ImgClose_OnTapped(object? sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
+    private void Window_OnClosing(object? sender, CancelEventArgs e)
+    {
+        IsClosing = true;
     }
 }

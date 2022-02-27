@@ -16,8 +16,8 @@ namespace OfCourseIStillLoveYou
         public static Gui Fetch;
         public static bool GuiEnabled;
         public static bool HasAddedButton;
-        private readonly float contentWidth = WindowWidth - 2 * LeftIndent;
-        private readonly float entryHeight = 20;
+        private const float ContentWidth = WindowWidth - 2 * LeftIndent;
+        private const float EntryHeight = 20;
         private bool _gameUiToggle;
         private float _windowHeight = 250;
         private Rect _windowRect;
@@ -100,7 +100,7 @@ namespace OfCourseIStillLoveYou
 
             line++;
 
-            _windowHeight = ContentTop + line * entryHeight + entryHeight + entryHeight;
+            _windowHeight = ContentTop + line * EntryHeight + EntryHeight + EntryHeight;
             _windowRect.height = _windowHeight;
         }
 
@@ -127,7 +127,7 @@ namespace OfCourseIStillLoveYou
 
         private void DrawCameraButton(MuMechModuleHullCamera camera, int line)
         {
-            var saveRect = new Rect(LeftIndent, ContentTop + line * entryHeight, contentWidth, entryHeight);
+            var saveRect = new Rect(LeftIndent, ContentTop + line * EntryHeight, ContentWidth, EntryHeight);
 
             if (GUI.Button(saveRect, GetCameraName(camera))) OpenCameraInstance(camera);
         }
