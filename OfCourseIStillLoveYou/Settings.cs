@@ -13,6 +13,10 @@ namespace OfCourseIStillLoveYou
 
         public static bool ConfigLoaded { get; set; }
 
+        public static int Width { get; set; }
+
+        public static int Height { get; set; }
+
         void Awake()
         {
             LoadConfig();
@@ -31,6 +35,9 @@ namespace OfCourseIStillLoveYou
                 ConfigNode settings = fileNode.GetNode("Settings");
                 EndPoint = settings.GetValue("EndPoint");
                 Port = int.Parse(settings.GetValue("Port"));
+                Width = int.Parse(settings.GetValue("Width"));
+                Height = int.Parse(settings.GetValue("Height"));
+
             }
             catch (Exception ex)
             {

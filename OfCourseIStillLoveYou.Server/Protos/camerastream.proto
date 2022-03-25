@@ -12,8 +12,6 @@ service CameraStream {
   rpc GetAverageFps (GetAverageFpsRequest)returns (GetAverageFpsResult);
 }
 
-
-
 message SendCameraStreamRequest {
   string cameraId = 1;
   string cameraName = 2;
@@ -54,5 +52,3 @@ message GetAverageFpsRequest {
 message GetAverageFpsResult {
    int32 averageFps = 1;
 }
-
-

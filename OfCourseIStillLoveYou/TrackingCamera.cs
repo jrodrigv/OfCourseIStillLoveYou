@@ -16,6 +16,7 @@ namespace OfCourseIStillLoveYou
         private const float Gap = 2;
         private const float Line = ButtonHeight + Gap;
         private const float ButtonWidth = 3 * ButtonHeight + 4 * Gap;
+        private const float MaxCameraSize = 360;
 
         private static readonly float controlsStartY = 22;
         private static readonly Font TelemetryFont = Font.CreateDynamicFontFromOSFont("Bahnschrift Semibold", 17);
@@ -36,9 +37,12 @@ namespace OfCourseIStillLoveYou
             GameDatabase.Instance.GetTexture("OfCourseIStillLoveYou/Textures/" + "resizeSquare", false);
 
         private readonly MuMechModuleHullCamera _hullcamera;
-        private readonly float camImageSize = 360;
-        private float _adjCamImageSize = 360;
 
+
+        private float _initialCamImageWidthSize = 360;
+        private float _initialCamImageHeightSize = 360;
+        private float _adjCamImageWidthSize = 360;
+        private float _adjCamImageHeightSize = 360;
 
         private readonly Camera[] _cameras = new Camera[3];
         private float _windowHeight;
@@ -50,7 +54,7 @@ namespace OfCourseIStillLoveYou
         private readonly WaitForSeconds _fixedDelay = new WaitForSeconds(0.030f);
         private byte[] _jpgTexture;
         public RenderTexture TargetCamRenderTexture;
-        private readonly Texture2D _texture2D = new Texture2D(768, 768, TextureFormat.ARGB32, false);
+        private readonly Texture2D _texture2D = new Texture2D(Settings.Width, Settings.Height, TextureFormat.ARGB32, false);
 
         
 
@@ -59,19 +63,42 @@ namespace OfCourseIStillLoveYou
             Id = id;
             _hullcamera = hullcamera;
 
-            TargetCamRenderTexture = new RenderTexture(768, 768, 24, RenderTextureFormat.ARGB32)
+            TargetCamRenderTexture = new RenderTexture(Settings.Width, Settings.Height, 24, RenderTextureFormat.ARGB32)
             {
                 antiAliasing = 1
             };
 
             TargetCamRenderTexture.Create();
-            _windowWidth = _adjCamImageSize + 3 * ButtonHeight + 16 + 2 * Gap;
-            _windowHeight = _adjCamImageSize + 23;
+
+            CalculateInitialSize();
+
+            _windowWidth = _adjCamImageWidthSize + 3 * ButtonHeight + 16 + 2 * Gap;
+            _windowHeight = _adjCamImageHeightSize  + 23;
             _windowRect = new Rect(Screen.width - _windowWidth, Screen.height - _windowHeight, _windowWidth,
                 _windowHeight);
             SetCameras();
 
             Enabled = true;
+        }
+
+        private void CalculateInitialSize()
+        {
+            if (Settings.Width > Settings.Height)
+            {
+                _adjCamImageHeightSize = Settings.Height * MaxCameraSize / Settings.Width;
+                _initialCamImageHeightSize = _adjCamImageHeightSize;
+                _adjCamImageWidthSize = 360;
+
+                
+            }
+            else
+            {
+                _adjCamImageWidthSize = Settings.Width * MaxCameraSize / Settings.Height;
+                _initialCamImageWidthSize = _adjCamImageWidthSize;
+                _adjCamImageHeightSize = 360;
+            }
+
+            Debug.Log($"OCISLY:_adjCamImageHeightSize = {_adjCamImageHeightSize} _adjCamImageWidthSize = {_adjCamImageWidthSize}");
         }
 
         public string Name { get; private set; }
@@ -248,7 +275,8 @@ namespace OfCourseIStillLoveYou
         {
             if (!Enabled) return;
 
-            _adjCamImageSize = camImageSize * TargetWindowScale;
+            _adjCamImageWidthSize = _initialCamImageWidthSize * TargetWindowScale;
+            _adjCamImageHeightSize = _initialCamImageHeightSize * TargetWindowScale;
 
             GUI.DragWindow(new Rect(0, 0, _windowHeight - 18, 30));
             if (GUI.Button(new Rect(_windowWidth - 18, 2, 20, 16), "X", GUI.skin.button))
@@ -296,7 +324,7 @@ namespace OfCourseIStillLoveYou
 
         private Rect DrawTexture()
         {
-            var imageRect = new Rect(2, 20, _adjCamImageSize, _adjCamImageSize);
+            var imageRect = new Rect(2, 20, _adjCamImageWidthSize, _adjCamImageHeightSize);
 
 
             GUI.DrawTexture(imageRect, TargetCamRenderTexture, ScaleMode.StretchToFill, false);
@@ -313,7 +341,7 @@ namespace OfCourseIStillLoveYou
             };
 
             var targetRangeRect = new Rect(imageRect.x,
-                _adjCamImageSize * 0.94f - (int) Mathf.Clamp(18 * TargetWindowScale, 9, 18), _adjCamImageSize,
+                _adjCamImageHeightSize * 0.94f - (int) Mathf.Clamp(18 * TargetWindowScale, 9, 18), _adjCamImageWidthSize,
                 (int) Mathf.Clamp(18 * TargetWindowScale, 10, 18));
 
 
@@ -363,13 +391,13 @@ namespace OfCourseIStillLoveYou
         {
             if (MinimalUi)
             {
-                _windowWidth = camImageSize * TargetWindowScale + 2 * Gap;
+                _windowWidth = _initialCamImageWidthSize* TargetWindowScale + 2 * Gap;
             }
             else
             {
-                _windowWidth = camImageSize * TargetWindowScale + 3 * ButtonHeight + 16 + 2 * Gap;
+                _windowWidth = _initialCamImageWidthSize * TargetWindowScale + 3 * ButtonHeight + 16 + 2 * Gap;
             }
-            _windowHeight = camImageSize * TargetWindowScale + 23;
+            _windowHeight = _initialCamImageHeightSize * TargetWindowScale + 23;
             _windowRect = new Rect(_windowRect.x, _windowRect.y, _windowWidth, _windowHeight);
         }
 
