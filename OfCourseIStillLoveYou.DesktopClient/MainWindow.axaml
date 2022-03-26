@@ -8,7 +8,7 @@
 
 
   <Panel Background="Black"  >
-    <Image Name="ImgCameraTexture" PointerPressed="InputElement_OnPointerPressed" Stretch="Uniform" Source="/Assets/OfCourseIStillLoveYou.png"   ClipToBounds="true"  DoubleTapped="ImgCameraTexture_OnDoubleTapped"></Image>
+    <Image Name="ImgCameraTexture" PointerPressed="InputElement_OnPointerPressed" Stretch="Uniform" Source="/Assets/OfCourseIStillLoveYou.png"   ClipToBounds="true"  DoubleTapped="ImgCameraTexture_OnDoubleTapped" ></Image>
     <DockPanel  Margin="10" ClipToBounds="True" >
       <Label Name="LabelCameras" Content="SELECT A CAMERA" Foreground="White" FontSize="14" FontFamily="Bahnschrift Semibold" FontWeight="400"></Label>
       <ComboBox Name="CbCameras" Margin="5,0,0,0" MinWidth="150" FontFamily="Bahnschrift Semibold"></ComboBox>

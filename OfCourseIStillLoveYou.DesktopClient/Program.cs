@@ -15,5 +15,8 @@ namespace OfCourseIStillLoveYou.DesktopClient
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .LogToTrace();
+
+
+
     }
 }

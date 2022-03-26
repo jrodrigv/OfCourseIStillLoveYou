@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -18,7 +19,7 @@ namespace OfCourseIStillLoveYou.DesktopClient;
 
 public class MainWindow : Window
 {
-    private const int Delay = 17;
+    private const int Delay = 16;
     private const string SettingPath = "settings.json";
     private const string Endpoint = "localhost";
     private const int Port = 5077;
@@ -31,6 +32,9 @@ public class MainWindow : Window
 
     private bool _statusUnstable;
     private Bitmap? _texture;
+    private double _desiredHeight;
+    private byte[]? _previousTexture;
+
 
     public MainWindow()
     {
@@ -42,7 +46,6 @@ public class MainWindow : Window
 
     public bool IsClosing { get; set; }
 
-    public CameraData? CurretCameraData { get; private set; }
 
     private void InitializeComponent()
     {
@@ -52,8 +55,10 @@ public class MainWindow : Window
 
         if (_settings != null) GrpcClient.ConnectToServer(_settings.EndPoint, _settings.Port);
 
-        Task.Run(CameraFetchWorker);
+
         Task.Run(CameraTextureWorker);
+        Task.Run(CameraFetchWorker);
+
     }
 
     private void ReadSettings()
@@ -75,59 +80,62 @@ public class MainWindow : Window
             _initialImage = (Bitmap)this.FindControl<Image>("ImgCameraTexture").Source);
     }
 
+
     private void CameraTextureWorker()
     {
         while (!IsClosing)
         {
             Task.Delay(Delay).Wait();
-
+            
             if (string.IsNullOrEmpty(_currentCamera)) continue;
 
+            var cameraData = GrpcClient.GetCameraDataAsync(_currentCamera).Result;
 
-            Dispatcher.UIThread
-                .InvokeAsync(() => this.FindControl<Image>("ImgCameraTexture").DesiredSize.Height)
-                .ContinueWith(imageHeight =>
-                {
-                    GrpcClient.GetCameraDataAsync(_currentCamera).ContinueWith(camaraData =>
-                    {
-                        if (camaraData.Result.Texture == null)
-                        {
-                            _texture = _initialImage;
-                        }
-                        else
-                        {
-                            using MemoryStream ms = new(camaraData.Result.Texture);
-                            _texture = Bitmap.DecodeToHeight(ms, (int)imageHeight.Result,
-                                BitmapInterpolationMode.MediumQuality);
-                        }
+            if (cameraData.Texture == null)
+            {
+                _texture = _initialImage;
+                _statusUnstable = true;
+                continue;
+            }
+            
+            if (ByteArrayCompare(cameraData.Texture, _previousTexture)) continue;
 
-                        CurretCameraData = camaraData.Result;
-                    }).ContinueWith(_ =>
-                        Dispatcher.UIThread.InvokeAsync(() =>
-                        {
-                            this.FindControl<Image>("ImgCameraTexture").Source = _texture;
+            if (_desiredHeight == 0) _desiredHeight = 800;
 
-                            if (CurretCameraData?.Texture == null)
-                            {
-                                _statusUnstable = true;
-                            }
-                            else
-                            {
-                                _statusUnstable = false;
+            using MemoryStream ms = new(cameraData.Texture);
+            _texture = Bitmap.DecodeToHeight(ms, (int)_desiredHeight,
+                BitmapInterpolationMode.LowQuality);
 
-                                var textInfo = this.FindControl<TextBlock>("TextInfo");
-                                StringBuilder sb = new();
-                                sb.AppendLine(CurretCameraData.Altitude);
-                                sb.AppendLine(CurretCameraData.Speed);
-                                textInfo.Text = sb.ToString();
+            _statusUnstable = false;
+            _previousTexture = cameraData.Texture;
 
-                                var window = this.FindControl<Window>("MainWindow");
-                                window.Title = CurretCameraData.CameraName;
-                            }
-                        }));
-                });
+
+            StringBuilder sb = new();
+            sb.AppendLine(cameraData.Altitude);
+            sb.AppendLine(cameraData.Speed);
+
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                _desiredHeight = this.FindControl<Image>("ImgCameraTexture").DesiredSize.Height;
+
+                this.FindControl<Image>("ImgCameraTexture").Source = _texture;
+
+                if (_statusUnstable) return;
+
+                var textInfo = this.FindControl<TextBlock>("TextInfo");
+                textInfo.Text = sb.ToString();
+
+                var window = this.FindControl<Window>("MainWindow");
+                window.Title = cameraData.CameraName;
+            });
         }
     }
+
+    static bool ByteArrayCompare(ReadOnlySpan<byte> a1, ReadOnlySpan<byte> a2)
+    {
+        return a1.SequenceEqual(a2);
+    }
+
 
     private void CameraFetchWorker()
     {
