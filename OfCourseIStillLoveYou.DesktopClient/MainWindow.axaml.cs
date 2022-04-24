@@ -19,7 +19,7 @@ namespace OfCourseIStillLoveYou.DesktopClient;
 
 public class MainWindow : Window
 {
-    private const int Delay = 16;
+    private const int Delay = 10;
     private const string SettingPath = "settings.json";
     private const string Endpoint = "localhost";
     private const int Port = 5077;
@@ -93,7 +93,6 @@ public class MainWindow : Window
 
             if (cameraData.Texture == null)
             {
-                _texture = _initialImage;
                 _statusUnstable = true;
                 continue;
             }
@@ -178,6 +177,7 @@ public class MainWindow : Window
     {
         var textInfo = this.FindControl<TextBlock>("TextInfo");
         textInfo.Text = "Waiting for camera feed...";
+        this.FindControl<Image>("ImgCameraTexture").Source = _initialImage;
     }
 
     private void NotifyUnstableCameraFeed()
@@ -189,6 +189,7 @@ public class MainWindow : Window
 
         var textInfo = this.FindControl<TextBlock>("TextInfo");
         textInfo.Text = "VIDEO CONNECTION HAS BEEN LOST. RIP";
+        this.FindControl<Image>("ImgCameraTexture").Source = _initialImage;
     }
 
     private void NotifyConnectingToServer()
