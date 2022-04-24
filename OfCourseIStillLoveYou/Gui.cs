@@ -151,7 +151,7 @@ namespace OfCourseIStillLoveYou
             {
                 Texture buttonTexture = GameDatabase.Instance.GetTexture("OfCourseIStillLoveYou/Textures/icon", false);
                 ApplicationLauncher.Instance.AddModApplication(EnableGui, DisableGui, Dummy, Dummy, Dummy, Dummy,
-                    ApplicationLauncher.AppScenes.ALWAYS, buttonTexture);
+                    ApplicationLauncher.AppScenes.FLIGHT, buttonTexture);
                 HasAddedButton = true;
             }
         }
