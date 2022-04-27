@@ -10,19 +10,30 @@
 KSP mod to display hullcam cameras views on different GUI inside or outside the game using a Desktop app and Server app.
 
 ## Requirements:
-* KSP 1.12.2
-* NET 5 runtime https://dotnet.microsoft.com/download/dotnet/5.0
+* KSP 1.12.3
+* NET 6 runtime https://dotnet.microsoft.com/download/dotnet/6.0
 * Latest HullcamVDS https://github.com/linuxgurugamer/HullcamVDSContinued/releases
 
 ## Highly recommended mods:
 * Physics Range Extender
-* Scatterer 0.0767 or newer https://github.com/LGhassen/Scatterer/releases
+* Scatterer 0.0835 or newer https://github.com/LGhassen/Scatterer/releases
 * If you want to use TUFX you need to use this version -> TUFX JR edition https://github.com/jrodrigv/TUFX/releases 
 
-## Mod Only Installation:
+## Mod Installation:
 * Download the zip file for Windows, Linux or Mac.
 * Copy the GameData folder into your KSP root folder
 
+## Mod Configuration:
+Inside the settings.cfg file you can modify the Cameras resolution and server connection
+
+```Settings
+{
+  EndPoint = localhost
+  Port = 5077
+  Width = 768
+  Height = 768
+}
+```
 ## Desktop & Server app setup:
 * Unzip the OfCourseIStillLoveYou.Server.zip and OfCourseIStillLoveYou.DesktopClient.zip
 * By default the mod, the server and the desktop client will connect to localhost:5077 but you can modify it:
@@ -32,7 +43,7 @@ KSP mod to display hullcam cameras views on different GUI inside or outside the 
 * Execute the OfCourseIStillLoveYou.Server.exe first, then OfCourseIStillLoveYou.DesktopClient.exe and finally start KSP
 
 ## Running the server as a Docker Container
-* Pull the image *docker pull jrodrigv/ofcourseistillloveyou:server_v1.0*
+* Pull the image *docker pull jrodrigv/ofcourseistillloveyou:latest*
 * Create a new container - example overriding endpoint to listen everything and from port 5000: *docker run -d -p 192.168.0.14:5000:5000 ofcourseistillloveyou:server_v1.0 --port 5000 --endpoint 0.0.0.0*
 
 ## Desktop Client usage
