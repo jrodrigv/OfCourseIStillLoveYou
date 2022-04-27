@@ -19,7 +19,7 @@ steps:
   displayName: Extracting dependencies
   inputs:
     archiveFilePatterns: '**\Dependencies.zip'
-    destinationFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou'
+    destinationFolder: '$(Build.SourcesDirectory)'
     cleanDestinationFolder: false
     overwriteExistingFiles: false
 
