@@ -23,6 +23,13 @@ steps:
     cleanDestinationFolder: false
     overwriteExistingFiles: false
 
+- task: PowerShell@2
+  displayName: listing files
+  inputs:
+    targetType: 'inline'
+    script: |
+     ls -R $(Build.SourcesDirectory)\OfCourseIStillLoveYou
+
 - task: NuGetToolInstaller@1
   inputs:
     versionSpec:
