@@ -19,16 +19,9 @@ steps:
   displayName: Extracting dependencies
   inputs:
     archiveFilePatterns: '**\Dependencies.zip'
-    destinationFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou'
+    destinationFolder: '$(Build.SourcesDirectory)\'
     cleanDestinationFolder: false
     overwriteExistingFiles: false
-
-- task: PowerShell@2
-  displayName: listing files
-  inputs:
-    targetType: 'inline'
-    script: |
-     ls -R $(Build.SourcesDirectory)\OfCourseIStillLoveYou
 
 - task: NuGetToolInstaller@1
   inputs:
