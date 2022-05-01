@@ -35,11 +35,17 @@ steps:
 - task: VSBuild@1
   displayName: Compiling mod
   inputs:
-    solution: '**\*.sln'
+    solution: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\OfCourseIStillLoveYou.csproj'
     msbuildArgs: '-p:PreBuildEvent=;PostBuildEvent= -p:Version=1.0.$(Build.BuildId)'
     platform: 'Any Cpu'
     configuration: 'Release'
     msbuildArchitecture: 'x64'
+
+- task: DeleteFiles@1
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Distribution\'
+    Contents: '**/System.Memory.dll' 
+    #RemoveSourceFolder: # Optional
 
 - task: PowerShell@2
   displayName: Creating artifacts folder
@@ -49,6 +55,7 @@ steps:
      New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/win-x64
      New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/linux-x64
      New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/osx-x64
+
 
 - task: CopyFiles@2
   displayName: Copy mod binaries to windows artifact directory
