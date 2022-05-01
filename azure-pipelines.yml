@@ -74,20 +74,20 @@ steps:
 - task: CopyFiles@2
   displayName: Copy grpc native depedency for Windows
   inputs:
-    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Dependencies\win'
+    SourceFolder: '$(Build.SourcesDirectory)\Dependencies\win'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\win-x64\GameData\OfCourseIStillLoveYou\Plugins'
 
 - task: CopyFiles@2
   displayName: Copy grpc native depedency for Linux
   inputs:
-    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Dependencies\linux'
+    SourceFolder: '$(Build.SourcesDirectory)\Dependencies\linux'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\linux-x64\GameData\OfCourseIStillLoveYou\Plugins'
 - task: CopyFiles@2
   displayName: Copy grpc native depedency for osx
   inputs:
-    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Dependencies\osx'
+    SourceFolder: '$(Build.SourcesDirectory)\Dependencies\osx'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\osx-x64\GameData\OfCourseIStillLoveYou\Plugins'
 
