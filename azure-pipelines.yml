@@ -23,6 +23,24 @@ steps:
     cleanDestinationFolder: false
     overwriteExistingFiles: false
 
+- task: NuGetToolInstaller@1
+  inputs:
+    versionSpec:
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: '**/*.sln'
+    feedsToUse: 'select'
+
+- task: VSBuild@1
+  displayName: Compiling mod
+  inputs:
+    solution: '**\*.sln'
+    msbuildArgs: '-p:PreBuildEvent=;PostBuildEvent= -p:Version=1.0.$(Build.BuildId)'
+    platform: 'Any Cpu'
+    configuration: 'Release'
+    msbuildArchitecture: 'x64'
+
 - task: PowerShell@2
   displayName: Creating artifacts folder
   inputs:
@@ -31,6 +49,47 @@ steps:
      New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/win-x64
      New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/linux-x64
      New-Item -ItemType "directory" -Path $(Build.ArtifactStagingDirectory)/osx-x64
+
+- task: CopyFiles@2
+  displayName: Copy mod binaries to windows artifact directory
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Distribution\'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\win-x64'
+
+- task: CopyFiles@2
+  displayName: Copy mod binaries to linux artifact directory
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Distribution\'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\linux-x64'
+
+- task: CopyFiles@2
+  displayName: Copy mod binaries to osx artifact directory
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Distribution\'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\osx-x64'
+
+- task: CopyFiles@2
+  displayName: Copy grpc native depedency for Windows
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Dependencies\win'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\win-x64\GameData\OfCourseIStillLoveYou\Plugins'
+
+- task: CopyFiles@2
+  displayName: Copy grpc native depedency for Linux
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Dependencies\linux'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\linux-x64\GameData\OfCourseIStillLoveYou\Plugins'
+- task: CopyFiles@2
+  displayName: Copy grpc native depedency for osx
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Dependencies\osx'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\osx-x64\GameData\OfCourseIStillLoveYou\Plugins'
 
 - task: DotNetCoreCLI@2
   displayName: Publishing Desktop win-x64
@@ -79,65 +138,6 @@ steps:
     publishWebProjects: false
     projects: '**/OfCourseIStillLoveYou.Server.csproj'
     arguments: '-c Release -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true -p:Version=1.0.$(Build.BuildId) --configuration Release --runtime osx-x64 --output $(Build.ArtifactStagingDirectory)\osx-x64'
-
-
-- task: NuGetToolInstaller@1
-  inputs:
-    versionSpec:
-- task: NuGetCommand@2
-  inputs:
-    command: 'restore'
-    restoreSolution: '**/*.sln'
-    feedsToUse: 'select'
-- task: VSBuild@1
-  inputs:
-    solution: '**\*.sln'
-    msbuildArgs: '-p:PreBuildEvent=;PostBuildEvent= -p:Version=1.0.$(Build.BuildId)'
-    platform: 'Any Cpu'
-    configuration: 'Release'
-    msbuildArchitecture: 'x64'
-
-- task: CopyFiles@2
-  displayName: Copy mod binaries to windows artifact directory
-  inputs:
-    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Distribution\'
-    Contents: '**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)\win-x64'
-
-- task: CopyFiles@2
-  displayName: Copy mod binaries to linux artifact directory
-  inputs:
-    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Distribution\'
-    Contents: '**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)\linux-x64'
-
-- task: CopyFiles@2
-  displayName: Copy mod binaries to osx artifact directory
-  inputs:
-    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Distribution\'
-    Contents: '**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)\osx-x64'
-
-- task: CopyFiles@2
-  displayName: Copy grpc native depedency for Windows
-  inputs:
-    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Dependencies\win'
-    Contents: '**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)\win-x64\GameData\OfCourseIStillLoveYou\Plugins'
-
-- task: CopyFiles@2
-  displayName: Copy grpc native depedency for Linux
-  inputs:
-    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Dependencies\linux'
-    Contents: '**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)\linux-x64\GameData\OfCourseIStillLoveYou\Plugins'
-- task: CopyFiles@2
-  displayName: Copy grpc native depedency for osx
-  inputs:
-    SourceFolder: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\Dependencies\osx'
-    Contents: '**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)\osx-x64\GameData\OfCourseIStillLoveYou\Plugins'
-    
 
 - task: ArchiveFiles@2
   inputs:
