@@ -35,79 +35,79 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\Dependencies\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\Dependencies\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="HullcamVDSContinued">
-      <HintPath>..\..\Dependencies\HullcamVDSContinued.dll</HintPath>
+      <HintPath>..\Dependencies\HullcamVDSContinued.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="KSPAssets">
-      <HintPath>..\..\Dependencies\KSPAssets.dll</HintPath>
+      <HintPath>..\Dependencies\KSPAssets.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="UnityEngine">
-      <HintPath>..\..\Dependencies\UnityEngine.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>..\..\Dependencies\UnityEngine.AnimationModule.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.AnimationModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>..\..\Dependencies\UnityEngine.AssetBundleModule.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.AssetBundleModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\Dependencies\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>..\..\Dependencies\UnityEngine.ImageConversionModule.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.ImageConversionModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>..\..\Dependencies\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.IMGUIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Dependencies\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.InputLegacyModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.InputModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Dependencies\UnityEngine.InputModule.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.InputModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>..\..\Dependencies\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TextCoreModule">
-      <HintPath>..\..\Dependencies\UnityEngine.TextCoreModule.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.TextCoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>..\..\Dependencies\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\Dependencies\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UIElementsModule">
-      <HintPath>..\..\Dependencies\UnityEngine.UIElementsModule.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.UIElementsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UIModule">
-      <HintPath>..\..\Dependencies\UnityEngine.UIModule.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.UIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestWWWModule">
-      <HintPath>..\..\Dependencies\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -178,7 +178,7 @@ SET ModName=OfCourseIStillLoveYou
 RD /S /Q $(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\
 MD $(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\
 
-xcopy /E /Y "$(ProjectDir)"..\..\Dependencies\win\grpc_csharp_ext.dll "$(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\"
+xcopy /E /Y "$(ProjectDir)"..\Dependencies\win\grpc_csharp_ext.dll "$(ProjectDir)Distribution\GameData\%25ModName%25\Plugins\"
 </PreBuildEvent>
   </PropertyGroup>
   <!-- <Target Name="BeforeBuild"> -->
