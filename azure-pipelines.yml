@@ -37,7 +37,7 @@ steps:
   inputs:
     solution: '$(Build.SourcesDirectory)\OfCourseIStillLoveYou\OfCourseIStillLoveYou.csproj'
     msbuildArgs: '-p:PreBuildEvent=;PostBuildEvent= -p:Version=1.0.$(Build.BuildId)'
-    platform: 'Any Cpu'
+    platform: 'AnyCpu'
     configuration: 'Release'
     msbuildArchitecture: 'x64'
 
