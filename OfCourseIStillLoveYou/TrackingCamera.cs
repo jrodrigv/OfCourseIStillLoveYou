@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using HullcamVDS;
 using OfCourseIStillLoveYou.Client;
@@ -56,7 +57,52 @@ namespace OfCourseIStillLoveYou
         public RenderTexture TargetCamRenderTexture;
         private readonly Texture2D _texture2D = new Texture2D(Settings.Width, Settings.Height, TextureFormat.ARGB32, false);
 
-        
+        private bool OddFrames = false;
+
+
+        public void ToogleCameras()
+        {
+            OddFrames = !OddFrames;
+            foreach (var camera in this._cameras)
+            {
+                camera.enabled = OddFrames;
+            }
+        }
+
+        public void SendCameraImage()
+        {
+
+            if (!OddFrames) return;
+            if (!StreamingEnabled) return;
+
+            Graphics.CopyTexture(TargetCamRenderTexture, _texture2D);
+
+            AsyncGPUReadback.Request(_texture2D, 0,
+                request =>
+                {
+                    Task.Run(() => _texture2D.LoadRawTextureData(request.GetData<byte>()))
+                        .ContinueWith(previous => _jpgTexture = _texture2D.EncodeToJPG())
+                        .ContinueWith(previous =>
+                            GrpcClient.SendCameraTextureAsync(new CameraData
+                            {
+                                CameraId = Id.ToString(),
+                                CameraName = Name,
+                                Speed = SpeedString,
+                                Altitude = AltitudeString,
+                                Texture = _jpgTexture
+                            }));
+                }
+            );
+            
+        }
+        //internal static void RenderTextureCamera(Camera camera)
+        //{
+        //    var canvasHackObject = canvasHackField.GetValue(null);
+        //    canvasHackField.SetValue(null, null);
+        //    camera.Render();
+        //    canvasHackField.SetValue(null, canvasHackObject);
+        //}
+
 
         public TrackingCamera(int id, MuMechModuleHullCamera hullcamera)
         {
@@ -131,49 +177,48 @@ namespace OfCourseIStillLoveYou
             return null;
         }
 
-        public IEnumerator SendCameraImage()
-        {
-            while (Enabled)
-            {
-                yield return _fixedDelay;
+        //public IEnumerator SendCameraImage()
+        //{
+        //    while (Enabled)
+        //    {
+        //        yield return _fixedDelay;
 
-                if (!Enabled) yield return null;
+        //        if (!Enabled) yield return null;
 
-                RenderCameras();
+        //        RenderCameras();
 
-                yield return _frameEnd;
+        //        yield return _frameEnd;
 
-                if (!StreamingEnabled) continue;
+        //        if (!StreamingEnabled) continue;
 
-                Graphics.CopyTexture(TargetCamRenderTexture, _texture2D);
+        //        Graphics.CopyTexture(TargetCamRenderTexture, _texture2D);
 
-                AsyncGPUReadback.Request(_texture2D, 0,
-                    request =>
-                    {
-                        Task.Run(() => _texture2D.LoadRawTextureData(request.GetData<byte>()))
-                            .ContinueWith(previous => _jpgTexture = _texture2D.EncodeToJPG())
-                            .ContinueWith(previous =>
-                                GrpcClient.SendCameraTextureAsync(new CameraData
-                                {
-                                    CameraId = Id.ToString(),
-                                    CameraName = Name,
-                                    Speed = SpeedString,
-                                    Altitude = AltitudeString,
-                                    Texture = _jpgTexture
-                                }));
-                    }
-                );
-            }
-        }
+        //        AsyncGPUReadback.Request(_texture2D, 0,
+        //            request =>
+        //            {
+        //                Task.Run(() => _texture2D.LoadRawTextureData(request.GetData<byte>()))
+        //                    .ContinueWith(previous => _jpgTexture = _texture2D.EncodeToJPG())
+        //                    .ContinueWith(previous =>
+        //                        GrpcClient.SendCameraTextureAsync(new CameraData
+        //                        {
+        //                            CameraId = Id.ToString(),
+        //                            CameraName = Name,
+        //                            Speed = SpeedString,
+        //                            Altitude = AltitudeString,
+        //                            Texture = _jpgTexture
+        //                        }));
+        //            }
+        //        );
+        //    }
+        //}
 
 
         private void SetCameras()
         {
             var cam1Obj = new GameObject();
             var partNearCamera = cam1Obj.AddComponent<Camera>();
-
+          
             partNearCamera.CopyFrom(Camera.allCameras.FirstOrDefault(cam => cam.name == "Camera 00"));
-
             partNearCamera.name = "jrNear";
             partNearCamera.transform.parent = _hullcamera.cameraTransformName.Length <= 0
                 ? _hullcamera.part.transform
@@ -183,9 +228,13 @@ namespace OfCourseIStillLoveYou
             partNearCamera.transform.localPosition = _hullcamera.cameraPosition;
             partNearCamera.fieldOfView = 50;
             partNearCamera.targetTexture = TargetCamRenderTexture;
+            partNearCamera.allowHDR = true;
+            partNearCamera.allowMSAA = true;
+            partNearCamera.enabled = true;
             _cameras[0] = partNearCamera;
+            _cameras[0].allowHDR = true;
+            cam1Obj.AddComponent<CanvasHack>();
 
-            
             //TUFX
             AddTufxPostProcessing();
 
@@ -203,12 +252,15 @@ namespace OfCourseIStillLoveYou
             partScaledCamera.transform.localScale = Vector3.one;
             partScaledCamera.fieldOfView = 50;
             partScaledCamera.targetTexture = TargetCamRenderTexture;
+            partScaledCamera.allowHDR = true;
+            partScaledCamera.allowMSAA = true;
+            partScaledCamera.enabled = true;
             _cameras[1] = partScaledCamera;
 
 
             var camRotator = cam2Obj.AddComponent<TgpCamRotator>();
             camRotator.NearCamera = partNearCamera;
-
+            cam2Obj.AddComponent<CanvasHack>();
 
             //galaxy camera
             var galaxyCamObj = new GameObject();
@@ -223,10 +275,14 @@ namespace OfCourseIStillLoveYou
             galaxyCam.transform.localScale = Vector3.one;
             galaxyCam.fieldOfView = 50;
             galaxyCam.targetTexture = TargetCamRenderTexture;
+            galaxyCam.allowHDR = true;
+            galaxyCam.allowMSAA = true;
+            galaxyCam.enabled = true;
             _cameras[2] = galaxyCam;
 
             var camRotatorgalaxy = galaxyCamObj.AddComponent<TgpCamRotator>();
             camRotatorgalaxy.NearCamera = partNearCamera;
+            galaxyCamObj.AddComponent<CanvasHack>();
 
             foreach (var t in _cameras)
                 t.enabled = false;

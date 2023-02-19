@@ -139,7 +139,7 @@ namespace OfCourseIStillLoveYou
                 {
                     var newCamera = new TrackingCamera(camera.GetInstanceID(), camera);
 
-                    StartCoroutine(newCamera.SendCameraImage());
+                    //StartCoroutine(newCamera.SendCameraImage());
 
                     Core.TrackedCameras.Add(camera.GetInstanceID(), newCamera);
                 }

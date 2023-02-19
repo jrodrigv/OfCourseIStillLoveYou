@@ -36,22 +36,37 @@ namespace OfCourseIStillLoveYou
             return result;
         }
 
+        void Update()
+        {
+            ToggleRender();
+        }
+
         void LateUpdate()
         {
-            UpdateTelemetry();
+            Refresh();
         }
 
 
-        private void UpdateTelemetry()
+        private void Refresh()
         {
             foreach (var trackedCamerasValue in TrackedCameras.Values)
             {
-                if (trackedCamerasValue.Enabled)
-                {
-                    trackedCamerasValue.CalculateSpeedAltitude();
-                }
+                if (!trackedCamerasValue.Enabled) continue;
+
+
+                trackedCamerasValue.SendCameraImage();
+                trackedCamerasValue.CalculateSpeedAltitude();
             }
         }
 
+        private void ToggleRender()
+        {
+            foreach (var trackedCamerasValue in TrackedCameras.Values)
+            {
+                if (!trackedCamerasValue.Enabled) continue;
+
+                trackedCamerasValue.ToogleCameras();
+            }
+        }
     }
 }
