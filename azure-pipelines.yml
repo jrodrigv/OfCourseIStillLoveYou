@@ -105,7 +105,7 @@ steps:
     zipAfterPublish: false
     publishWebProjects: false
     projects: '**/OfCourseIStillLoveYou.DesktopClient.csproj'
-    arguments: '-p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true -p:Version=1.0.$(Build.BuildId) --configuration Release --runtime win-x64 --output $(Build.ArtifactStagingDirectory)\win-x64'
+    arguments: '-p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:Version=1.0.$(Build.BuildId) --configuration Release --runtime win-x64 --output $(Build.ArtifactStagingDirectory)\win-x64'
 
 - task: DotNetCoreCLI@2
   displayName: Publishing Server win-x64
@@ -123,7 +123,7 @@ steps:
     zipAfterPublish: false
     publishWebProjects: false
     projects: '**/OfCourseIStillLoveYou.DesktopClient.csproj'
-    arguments: '-p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true -p:Version=1.0.$(Build.BuildId) --configuration Release --runtime linux-x64 --output $(Build.ArtifactStagingDirectory)\linux-x64'
+    arguments: '-p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:Version=1.0.$(Build.BuildId) --configuration Release --runtime linux-x64 --output $(Build.ArtifactStagingDirectory)\linux-x64'
 
 - task: DotNetCoreCLI@2
   displayName: Publishing Server linux-x64
@@ -141,7 +141,7 @@ steps:
     zipAfterPublish: false
     publishWebProjects: false
     projects: '**/OfCourseIStillLoveYou.DesktopClient.csproj'
-    arguments: '-p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true -p:Version=1.0.$(Build.BuildId) --configuration Release --runtime osx-x64 --output $(Build.ArtifactStagingDirectory)\osx-x64'
+    arguments: '-p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:Version=1.0.$(Build.BuildId) --configuration Release --runtime osx-x64 --output $(Build.ArtifactStagingDirectory)\osx-x64'
 
 - task: DotNetCoreCLI@2
   displayName: Publishing Server osx-x64
