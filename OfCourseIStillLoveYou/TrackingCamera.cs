@@ -49,7 +49,6 @@ namespace OfCourseIStillLoveYou
         private readonly Texture2D _texture2D = new Texture2D(Settings.Width, Settings.Height, TextureFormat.ARGB32, false);
 
         public bool OddFrames;
-        private byte[] texture;
         private byte[] _jpgTexture;
 
         public void ToogleCameras()

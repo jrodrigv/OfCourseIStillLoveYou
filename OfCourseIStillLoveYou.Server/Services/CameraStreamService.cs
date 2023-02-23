@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using Google.Protobuf;
 using Grpc.Core;
 using OfCourseIStillLoveYou.Communication;
+using Timer = System.Timers.Timer;
 
 namespace OfCourseIStillLoveYou.Server.Services
 {
@@ -21,12 +23,14 @@ namespace OfCourseIStillLoveYou.Server.Services
 
         public static ConcurrentDictionary<string, CameraData> CameraTextures = new();
 
+        public static ConcurrentDictionary<string, ManualResetEventSlim> SyncroReading = new();
+
         public static ConcurrentDictionary<string, DateTime> CameraLastOperation = new();
 
         public CameraStreamService()
         {
             var numProcs = Environment.ProcessorCount;
-            var concurrencyLevel = numProcs * 2;
+            var concurrencyLevel = numProcs;
 
             CameraTextures = new ConcurrentDictionary<string, CameraData>(concurrencyLevel, InitialCapacity);
             CameraLastOperation = new ConcurrentDictionary<string, DateTime>(concurrencyLevel, InitialCapacity);
@@ -85,7 +89,18 @@ namespace OfCourseIStillLoveYou.Server.Services
                     Speed = request.Speed, Texture = request.Texture.ToByteArray()
                 };
 
+                
                 _ = CameraTextures.AddOrUpdate(request.CameraId, newCameraData, (_, _) => newCameraData);
+
+                if (SyncroReading.ContainsKey(request.CameraId))
+                {
+                    SyncroReading[request.CameraId].Set();
+                }
+                else
+                {
+                    _ = SyncroReading.TryAdd(request.CameraId, new ManualResetEventSlim(true));
+                }
+                
 
                 var currentTime = DateTime.Now;
                 _ = CameraLastOperation.AddOrUpdate(request.CameraId, currentTime, (_, _) => currentTime);
@@ -115,6 +130,8 @@ namespace OfCourseIStillLoveYou.Server.Services
             {
                 if (!CameraTextures.ContainsKey(request.CameraId))
                     return new GetCameraTextureResult {Texture = ByteString.Empty};
+
+                SyncroReading[request.CameraId].Wait();
 
                 var result = new GetCameraTextureResult
                 {

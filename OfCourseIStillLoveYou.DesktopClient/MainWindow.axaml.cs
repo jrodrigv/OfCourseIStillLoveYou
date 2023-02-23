@@ -33,7 +33,6 @@ public class MainWindow : Window
     private bool _statusUnstable;
     private Bitmap? _texture;
     private double _desiredHeight;
-    private byte[]? _previousTexture;
 
 
     public MainWindow()
@@ -81,15 +80,15 @@ public class MainWindow : Window
     }
 
 
-    private void CameraTextureWorker()
+    private async void CameraTextureWorker()
     {
         while (!IsClosing)
         {
-            Task.Delay(Delay).Wait();
+            await Task.Delay(Delay);
             
             if (string.IsNullOrEmpty(_currentCamera)) continue;
 
-            var cameraData = GrpcClient.GetCameraDataAsync(_currentCamera).Result;
+            var cameraData = await GrpcClient.GetCameraDataAsync(_currentCamera);
 
             if (cameraData.Texture == null)
             {
@@ -97,25 +96,21 @@ public class MainWindow : Window
                 continue;
             }
             
-            if (ByteArrayCompare(cameraData.Texture, _previousTexture)) continue;
-
             if (_desiredHeight == 0) _desiredHeight = 800;
 
-            using MemoryStream ms = new(cameraData.Texture);
-            _texture = Bitmap.DecodeToHeight(ms, (int)_desiredHeight,
-                BitmapInterpolationMode.LowQuality);
+            _texture = await GetDecodedBitmap(cameraData.Texture);
 
             _statusUnstable = false;
-            _previousTexture = cameraData.Texture;
-
 
             StringBuilder sb = new();
             sb.AppendLine(cameraData.Altitude);
             sb.AppendLine(cameraData.Speed);
 
-            Dispatcher.UIThread.InvokeAsync(() =>
+            await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 _desiredHeight = this.FindControl<Image>("ImgCameraTexture").DesiredSize.Height;
+
+                if (_desiredHeight == 0) return;
 
                 this.FindControl<Image>("ImgCameraTexture").Source = _texture;
 
@@ -128,6 +123,16 @@ public class MainWindow : Window
                 window.Title = cameraData.CameraName;
             });
         }
+    }
+
+    private async Task<Bitmap?> GetDecodedBitmap(byte[] encodedArray)
+    {
+        return await Task.Run(() =>
+        {
+            using MemoryStream ms = new(encodedArray);
+            return Bitmap.DecodeToHeight(ms, (int)_desiredHeight,
+                BitmapInterpolationMode.LowQuality);
+        });
     }
 
     static bool ByteArrayCompare(ReadOnlySpan<byte> a1, ReadOnlySpan<byte> a2)
