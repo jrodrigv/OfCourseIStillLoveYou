@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using HullcamVDS;
 using OfCourseIStillLoveYou.Client;
@@ -18,6 +16,7 @@ namespace OfCourseIStillLoveYou
         private const float Line = ButtonHeight + Gap;
         private const float ButtonWidth = 3 * ButtonHeight + 4 * Gap;
         private const float MaxCameraSize = 360;
+        private const string Altitude = "ALTITUDE: ", Km = " KM", Speed = "SPEED: ", Kmh = " KM/H";
 
         private static readonly float controlsStartY = 22;
         private static readonly Font TelemetryFont = Font.CreateDynamicFontFromOSFont("Bahnschrift Semibold", 17);
@@ -28,10 +27,6 @@ namespace OfCourseIStillLoveYou
 
         private static readonly GUIStyle TelemetryGuiStyle = new GUIStyle()
             {alignment = TextAnchor.MiddleCenter, normal = new GUIStyleState() {textColor = Color.white}, fontStyle = FontStyle.Bold, font = TelemetryFont };
-
-        private static readonly GUIStyle ButtonGuiStyle = new GUIStyle()
-            { alignment = TextAnchor.MiddleCenter, normal = new GUIStyleState() { textColor = Color.white }, fontStyle = FontStyle.Bold, font = TelemetryFont };
-
 
 
         public static Texture2D ResizeTexture =
@@ -50,15 +45,12 @@ namespace OfCourseIStillLoveYou
 
         private Rect _windowRect;
         private float _windowWidth;
-
-        private readonly WaitForEndOfFrame _frameEnd = new WaitForEndOfFrame();
-        private readonly WaitForSeconds _fixedDelay = new WaitForSeconds(0.030f);
-        private byte[] _jpgTexture;
         public RenderTexture TargetCamRenderTexture;
         private readonly Texture2D _texture2D = new Texture2D(Settings.Width, Settings.Height, TextureFormat.ARGB32, false);
 
-        private bool OddFrames = false;
-
+        public bool OddFrames;
+        private byte[] texture;
+        private byte[] _jpgTexture;
 
         public void ToogleCameras()
         {
@@ -71,7 +63,6 @@ namespace OfCourseIStillLoveYou
 
         public void SendCameraImage()
         {
-
             if (!OddFrames) return;
             if (!StreamingEnabled) return;
 
@@ -93,15 +84,8 @@ namespace OfCourseIStillLoveYou
                             }));
                 }
             );
-            
         }
-        //internal static void RenderTextureCamera(Camera camera)
-        //{
-        //    var canvasHackObject = canvasHackField.GetValue(null);
-        //    canvasHackField.SetValue(null, null);
-        //    camera.Render();
-        //    canvasHackField.SetValue(null, canvasHackObject);
-        //}
+   
 
 
         public TrackingCamera(int id, MuMechModuleHullCamera hullcamera)
@@ -176,42 +160,6 @@ namespace OfCourseIStillLoveYou
             Debug.Log("Couldn't find " + cameraName);
             return null;
         }
-
-        //public IEnumerator SendCameraImage()
-        //{
-        //    while (Enabled)
-        //    {
-        //        yield return _fixedDelay;
-
-        //        if (!Enabled) yield return null;
-
-        //        RenderCameras();
-
-        //        yield return _frameEnd;
-
-        //        if (!StreamingEnabled) continue;
-
-        //        Graphics.CopyTexture(TargetCamRenderTexture, _texture2D);
-
-        //        AsyncGPUReadback.Request(_texture2D, 0,
-        //            request =>
-        //            {
-        //                Task.Run(() => _texture2D.LoadRawTextureData(request.GetData<byte>()))
-        //                    .ContinueWith(previous => _jpgTexture = _texture2D.EncodeToJPG())
-        //                    .ContinueWith(previous =>
-        //                        GrpcClient.SendCameraTextureAsync(new CameraData
-        //                        {
-        //                            CameraId = Id.ToString(),
-        //                            CameraName = Name,
-        //                            Speed = SpeedString,
-        //                            Altitude = AltitudeString,
-        //                            Texture = _jpgTexture
-        //                        }));
-        //            }
-        //        );
-        //    }
-        //}
-
 
         private void SetCameras()
         {
@@ -288,7 +236,6 @@ namespace OfCourseIStillLoveYou
                 t.enabled = false;
         }
 
-
         private void AddTufxPostProcessing()
         {
             try
@@ -300,7 +247,6 @@ namespace OfCourseIStillLoveYou
                 // ignored
             }
         }
-
 
         public void CreateGui()
         {
@@ -427,8 +373,9 @@ namespace OfCourseIStillLoveYou
         {
             var altitudeInKm = (float) Math.Round(_hullcamera.vessel.altitude / 1000f, 1);
             var speed = (int) Math.Round(_hullcamera.vessel.speed * 3.6f, 0);
-            AltitudeString = "ALTITUDE: " + altitudeInKm.ToString("0.0") + " KM";
-            SpeedString = "SPEED: " + speed + " KM/H";
+           
+            AltitudeString = string.Concat(Altitude, altitudeInKm.ToString("0.0"), Km);
+            SpeedString = string.Concat(Speed, speed, Kmh);
         }
 
         private void UpdateTargetScale(float diff)
@@ -467,16 +414,6 @@ namespace OfCourseIStillLoveYou
                 windowPosition.x = Screen.width - windowPosition.width;
             if (windowPosition.yMax > Screen.height)
                 windowPosition.y = Screen.height - windowPosition.height;
-        }
-
-        private void RenderCameras()
-        {
-            for (var i = _cameras.Length - 1; i >= 0; i--)
-            {
-                if (_cameras[i] == null) return;
-
-                _cameras[i].Render();
-            }
         }
 
         public void Disable()

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using HullcamVDS;
 using OfCourseIStillLoveYou.Client;
 using UnityEngine;
@@ -49,22 +51,20 @@ namespace OfCourseIStillLoveYou
 
         private void Refresh()
         {
-            foreach (var trackedCamerasValue in TrackedCameras.Values)
+            foreach (var trackedCamerasValue in TrackedCameras.Values.Where(trackedCamerasValue => trackedCamerasValue.Enabled))
             {
-                if (!trackedCamerasValue.Enabled) continue;
-
-
-                trackedCamerasValue.SendCameraImage();
+                if (!trackedCamerasValue.OddFrames) continue;
+               
                 trackedCamerasValue.CalculateSpeedAltitude();
+                trackedCamerasValue.SendCameraImage();
+               
             }
         }
 
         private void ToggleRender()
         {
-            foreach (var trackedCamerasValue in TrackedCameras.Values)
+            foreach (var trackedCamerasValue in TrackedCameras.Values.Where(trackedCamerasValue => trackedCamerasValue.Enabled))
             {
-                if (!trackedCamerasValue.Enabled) continue;
-
                 trackedCamerasValue.ToogleCameras();
             }
         }
