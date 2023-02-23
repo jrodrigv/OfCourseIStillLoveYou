@@ -10,13 +10,13 @@
 KSP mod to display hullcam cameras views on different GUI inside or outside the game using a Desktop app and Server app.
 
 ## Requirements:
-* KSP 1.12.3
-* NET 6 runtime https://dotnet.microsoft.com/download/dotnet/6.0
+* KSP 1.12.5
+* NET 7 runtime https://dotnet.microsoft.com/en-us/download/dotnet/7.0
 * Latest HullcamVDS https://github.com/linuxgurugamer/HullcamVDSContinued/releases
 
 ## Highly recommended mods:
 * Physics Range Extender
-* Scatterer 0.0835 or newer https://github.com/LGhassen/Scatterer/releases
+* Scatterer 0.0838 or newer https://github.com/LGhassen/Scatterer/releases
 * If you want to use TUFX you need to use this version -> TUFX JR edition https://github.com/jrodrigv/TUFX/releases 
 
 ## Mod Installation:
