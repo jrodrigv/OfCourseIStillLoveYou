@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using HullcamVDS;
@@ -60,31 +60,73 @@ namespace OfCourseIStillLoveYou
             }
         }
 
+        private bool _firstFrameLogged;
+        private int _consecutiveEmptyJpegs;
+        private int _consecutiveExceptions;
+
         public void SendCameraImage()
         {
             if (!OddFrames) return;
             if (!StreamingEnabled) return;
 
-            Graphics.CopyTexture(TargetCamRenderTexture, _texture2D);
+            try
+            {
+                var previousActive = RenderTexture.active;
+                RenderTexture.active = TargetCamRenderTexture;
+                _texture2D.ReadPixels(new Rect(0, 0, _texture2D.width, _texture2D.height), 0, 0);
+                _texture2D.Apply();
+                RenderTexture.active = previousActive;
 
-            AsyncGPUReadback.Request(_texture2D, 0,
-                request =>
+                _jpgTexture = _texture2D.EncodeToJPG();
+
+                if (_jpgTexture == null || _jpgTexture.Length == 0)
                 {
-                    Task.Run(() => _texture2D.LoadRawTextureData(request.GetData<byte>()))
-                        .ContinueWith(previous => _jpgTexture = _texture2D.EncodeToJPG())
-                        .ContinueWith(previous =>
-                            GrpcClient.SendCameraTextureAsync(new CameraData
-                            {
-                                CameraId = Id.ToString(),
-                                CameraName = Name,
-                                Speed = SpeedString,
-                                Altitude = AltitudeString,
-                                Texture = _jpgTexture
-                            }));
+                    if (_consecutiveEmptyJpegs == 0 || _consecutiveEmptyJpegs % 300 == 0)
+                    {
+                        Debug.Log($"[OCISLY] cam={Id} EncodeToJPG produced empty buffer");
+                    }
+                    _consecutiveEmptyJpegs++;
+                    return;
                 }
-            );
+                _consecutiveEmptyJpegs = 0;
+                _consecutiveExceptions = 0;
+
+                if (!_firstFrameLogged)
+                {
+                    _firstFrameLogged = true;
+                    Debug.Log($"[OCISLY] cam={Id} streaming OK ({_texture2D.width}x{_texture2D.height}, {_jpgTexture.Length} bytes)");
+                }
+
+                var payload = new CameraData
+                {
+                    CameraId = Id.ToString(),
+                    CameraName = Name,
+                    Speed = SpeedString,
+                    Altitude = AltitudeString,
+                    Texture = _jpgTexture,
+                };
+
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        GrpcClient.SendCameraTextureAsync(payload);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log($"[OCISLY] cam={Id} SendCameraTextureAsync threw: {ex.GetType().Name}: {ex.Message}");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                if (_consecutiveExceptions == 0 || _consecutiveExceptions % 300 == 0)
+                {
+                    Debug.Log($"[OCISLY] cam={Id} capture pipeline threw: {ex.GetType().Name}: {ex.Message}");
+                }
+                _consecutiveExceptions++;
+            }
         }
-   
 
 
         public TrackingCamera(int id, MuMechModuleHullCamera hullcamera)
@@ -118,7 +160,7 @@ namespace OfCourseIStillLoveYou
                 _initialCamImageHeightSize = _adjCamImageHeightSize;
                 _adjCamImageWidthSize = 360;
 
-                
+
             }
             else
             {
@@ -164,7 +206,7 @@ namespace OfCourseIStillLoveYou
         {
             var cam1Obj = new GameObject();
             var partNearCamera = cam1Obj.AddComponent<Camera>();
-          
+
             partNearCamera.CopyFrom(Camera.allCameras.FirstOrDefault(cam => cam.name == "Camera 00"));
             partNearCamera.name = "jrNear";
             partNearCamera.transform.parent = _hullcamera.cameraTransformName.Length <= 0
@@ -283,7 +325,7 @@ namespace OfCourseIStillLoveYou
             if (GUI.Button(new Rect(_windowWidth - 18, 2, 20, 16), "X", GUI.skin.button))
             {
                 Disable();
-                
+
                 return;
             }
 
@@ -372,7 +414,7 @@ namespace OfCourseIStillLoveYou
         {
             var altitudeInKm = (float) Math.Round(_hullcamera.vessel.altitude / 1000f, 1);
             var speed = (int) Math.Round(_hullcamera.vessel.speed * 3.6f, 0);
-           
+
             AltitudeString = string.Concat(Altitude, altitudeInKm.ToString("0.0"), Km);
             SpeedString = string.Concat(Speed, speed, Kmh);
         }
